@@ -1,0 +1,1 @@
+export const APIUrl : string = "http://127.0.0.1:8000/home"
