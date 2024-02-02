@@ -2,14 +2,33 @@
 import React from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Input, Button, Form, Row, Col, Typography } from 'antd';
-
+import { UserLoginMessage } from './UserLoginMessage';
+import { SERVER_ROOT_URL } from '../Global/url';
+import { setUserToken } from '../Global/TokenStore';
+import { useRouter } from 'next/navigation';
 
 const { Title } = Typography;
 
 const RegistrationForm: React.FC = () => {
+  const router = useRouter()
   const onFinish = (values: any) => {
     console.log('Received values:', values);
-    // 在这里可以处理用户注册逻辑，比如发送请求到服务器
+    console.log('userName:', values.userName);
+    console.log('password:', values.password)
+    console.log(new UserLoginMessage(values.userName, values.password))
+    fetch(SERVER_ROOT_URL + "admin/login",{
+      method: "POST", 
+      headers: {"Content-Type":"text/plain"},
+      body: JSON.stringify(new UserLoginMessage(values.userName, values.password))
+    }).then(response => response.json()).then(replyJson => {
+      console.log(replyJson)
+      if (replyJson.status === 0) {
+          setUserToken(replyJson.message)
+          router.push("home");
+      } else {
+          alert(replyJson.message) //以后改一个状态条，优雅一点
+      }
+    }).catch((e) => console.log(e))
   };
 
 

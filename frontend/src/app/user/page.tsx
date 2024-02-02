@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { HomeButton } from "../GlobalComponents/navi";
+import { HomeButton } from "../Global/navi";
 
 const UserCenterHome = () => {
     return <>
