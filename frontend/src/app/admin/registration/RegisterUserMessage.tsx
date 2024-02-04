@@ -1,15 +1,17 @@
 import { TSMSPMessage } from "@/app/Global/message";
 export class ResgisterUserMessage extends TSMSPMessage {
     userName : string
+    studentID : string 
     password : string
-    schoolID: number
+    schoolName: string
     enrollmentYear: number
     studyPeriod: string
-    constructor(userName : string, password : string, schoolID: number, enrollmentYear:number, studyPeriod: string){
+    constructor(userName : string, studentID: string, password : string, enrollmentYear:number,  studyPeriod: string, schoolName: string){
         super();
         this.userName = userName
+        this.studentID = studentID
         this.password = password
-        this.schoolID = schoolID
+        this.schoolName = schoolName
         this.enrollmentYear = enrollmentYear
         this.studyPeriod = studyPeriod
     }

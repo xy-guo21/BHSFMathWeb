@@ -1,10 +1,10 @@
 import { TSMSPMessage } from "@/app/Global/message";
 export class AdminLoginMessage extends TSMSPMessage {
-    userName : string
+    adminID : string
     password : string
-    constructor(userName : string, password : string) {
+    constructor(adminID : string, password : string) {
         super();
-        this.userName = userName
+        this.adminID = adminID
         this.password = password
     }
 }

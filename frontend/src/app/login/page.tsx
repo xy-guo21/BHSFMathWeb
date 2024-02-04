@@ -6,6 +6,7 @@ import { UserLoginMessage } from './UserLoginMessage';
 import { SERVER_ROOT_URL } from '../Global/url';
 import { setUserToken } from '../Global/TokenStore';
 import { useRouter } from 'next/navigation';
+import { DEBUG_NO_BACKEND } from '../Global/self_setting';
 
 const { Title } = Typography;
 
@@ -13,13 +14,17 @@ const LoginForm: React.FC = () => {
   const router = useRouter()
   const onFinish = (values: any) => {
     console.log('Received values:', values);
-    console.log('userName:', values.userName);
+    console.log('student_id:', values.student_id);
     console.log('password:', values.password)
-    console.log(new UserLoginMessage(values.userName, values.password))
-    fetch(SERVER_ROOT_URL + "admin/login",{
+    console.log(new UserLoginMessage(values.student_id, values.password))
+    if (DEBUG_NO_BACKEND){
+      router.push("home")
+      return
+    }
+    fetch(SERVER_ROOT_URL + "login",{
       method: "POST", 
       headers: {"Content-Type":"text/plain"},
-      body: JSON.stringify(new UserLoginMessage(values.userName, values.password))
+      body: JSON.stringify(new UserLoginMessage(values.student_id, values.password))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
       if (replyJson.status === 0) {

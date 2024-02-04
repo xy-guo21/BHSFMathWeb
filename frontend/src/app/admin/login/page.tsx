@@ -7,6 +7,7 @@ import {create} from 'zustand'
 import { setUserToken } from '@/app/Global/TokenStore';
 import { useRouter } from 'next/navigation';
 import { SERVER_ROOT_URL } from '@/app/Global/url';
+import { DEBUG_NO_BACKEND } from '@/app/Global/self_setting';
 
 const { Title } = Typography;
 
@@ -15,13 +16,18 @@ const RegistrationForm: React.FC = () => {
   const router = useRouter();
   const onFinish = (values: any) => {
     console.log('Received values:', values);
-    console.log('userName:', values.userName);
+    console.log('admin_id:', values.admin_id);
     console.log('password:', values.password)
-    console.log(new AdminLoginMessage(values.userName, values.password))
+    console.log(new AdminLoginMessage(values.admin_id, values.password))
+    if (DEBUG_NO_BACKEND){
+      setUserToken("test_usertoken")
+      router.push("/admin/home");
+      return
+    }
     fetch(SERVER_ROOT_URL + "admin/login",{
       method: "POST", 
       headers: {"Content-Type":"text/plain"},
-      body: JSON.stringify(new AdminLoginMessage(values.userName, values.password))
+      body: JSON.stringify(new AdminLoginMessage(values.admin_id, values.password))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
       if (replyJson.status === 0) {
@@ -51,12 +57,12 @@ const RegistrationForm: React.FC = () => {
             rules={[
               {
                 required: true,
-                message: '请输入账号！',
+                message: '请输入管理员账号！',
               },
             ]}
           >
             <Input
-              placeholder="请输入账号"
+              placeholder="请输入管理员账号"
               prefix={<UserOutlined className="site-form-item-icon" />}
             />
           </Form.Item>

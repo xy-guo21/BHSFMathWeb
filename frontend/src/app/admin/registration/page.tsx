@@ -4,76 +4,11 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Input, Button, Form, Row, Col, Typography, Select, Cascader} from 'antd';
 import { SERVER_ROOT_URL } from '@/app/Global/url';
 import { ResgisterUserMessage } from './RegisterUserMessage';
+import { SCHOOL_OPTIONS } from './school_list';
+import { DEBUG_NO_BACKEND } from '@/app/Global/self_setting';
 
 
 const { Title } = Typography;
-
-interface Option {
-  value: string | number;
-  label: string;
-  children?: Option[];
-}
-
-const options: Option[] = [
-  {
-    value: 'primary',
-    label: '小学',
-    children: [
-      {
-        value: 'huangchenggen',
-        label: '黄城根小学',
-      },
-    ],
-  },
-  {
-    value: 'juniorhigh',
-    label: '初中',
-    children: [
-      {
-        value: 'bhsf',
-        label: '北京四中（初中部）',
-      },
-      {
-        value: 'sdsz',
-        label: '北师大附属实验中学（初中部）',
-      },
-      {
-        value: 'sanfan',
-        label: '三帆中学',
-      },
-      {
-        value: '8ms',
-        label: '北京八中（初中部）',
-      },
-      {
-        value: 'bj13zfx',
-        label: '北京十三中分校',
-      },
-    ],
-  },
-  {
-    value: 'seniorhigh',
-    label: '高中',
-    children: [
-      {
-        value: 'bhsf',
-        label: '北京四中（高中部）',
-      },
-      {
-        value: 'sdsz',
-        label: '北师大附属实验中学（高中部）',
-      },
-      {
-        value: 'shsbnu',
-        label: '北师大二附',
-      },
-      {
-        value: '8ms',
-        label: '北京八中（高中部）',
-      },
-    ],
-  },
-];
 
 const onChange = (value: string[]) => {
   console.log(value);
@@ -82,11 +17,17 @@ const onChange = (value: string[]) => {
 const RegistrationForm: React.FC = () => {
   const onFinish = (values: any) => {
     console.log('Received values:', values);
+    console.log('school = ', values.school)
+    console.log(new ResgisterUserMessage(values.username, values.student_id, values.password, values.enrollment, values.school[0], values.school[1]))
     // 在这里可以处理用户注册逻辑，比如发送请求到服务器
+    if (DEBUG_NO_BACKEND) {
+      alert("添加用户成功")
+      return
+    }
     fetch(SERVER_ROOT_URL+'admin/registration',{
       method: "POST", 
       headers:{"Content-Type":"text/plain"},
-      body: JSON.stringify(new ResgisterUserMessage(values.userName, values.password, values.schoolID, values.enrollmentYear, values.studyPeriod))
+      body: JSON.stringify(new ResgisterUserMessage(values.username, values.student_id, values.password, values.enrollment, values.school[0], values.school[1]))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
       if (replyJson.status === 0) {
@@ -180,7 +121,7 @@ const RegistrationForm: React.FC = () => {
               },
             ]}
           >
-            <Cascader options={options} onChange={onChange} placeholder="请选择学校" />
+            <Cascader options={SCHOOL_OPTIONS} onChange={onChange} placeholder="请选择学校" />
           </Form.Item>
 
           <Form.Item
