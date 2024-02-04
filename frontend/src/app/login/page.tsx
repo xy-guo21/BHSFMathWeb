@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 const { Title } = Typography;
 
-const RegistrationForm: React.FC = () => {
+const LoginForm: React.FC = () => {
   const router = useRouter()
   const onFinish = (values: any) => {
     console.log('Received values:', values);
@@ -36,25 +36,29 @@ const RegistrationForm: React.FC = () => {
     <Row justify="center" align="middle" style={{ height: '100vh' }}>
       <Col span={8}>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          UserLogin
+          登录
         </Title>
         <Form
-          name="registration_form"
+          name="login_form"
           onFinish={onFinish}
           initialValues={{ remember: true }}
           scrollToFirstError
         >
           <Form.Item
-            name="username"
+            name="student_id"
             rules={[
               {
                 required: true,
-                message: 'Please input your username!',
+                message: '请输入学号！',
+              },
+              {
+                pattern: /^[0-9]+$/,
+                message: '学号只能包含数字！',
               },
             ]}
           >
             <Input
-              placeholder="Enter your username"
+              placeholder="请输入学号"
               prefix={<UserOutlined className="site-form-item-icon" />}
             />
           </Form.Item>
@@ -64,19 +68,19 @@ const RegistrationForm: React.FC = () => {
             rules={[
               {
                 required: true,
-                message: 'Please input your password!',
+                message: '请输入密码！',
               },
             ]}
           >
             <Input.Password
-              placeholder="Input password"
+              placeholder="请输入密码"
               iconRender={(visible) => (visible ? <LockOutlined /> : <LockOutlined />)}
             />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              Register
+              登录
             </Button>
           </Form.Item>
         </Form>
@@ -85,4 +89,4 @@ const RegistrationForm: React.FC = () => {
   );
 };
 
-export default RegistrationForm;
+export default LoginForm;

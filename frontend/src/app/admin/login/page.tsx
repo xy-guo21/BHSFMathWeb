@@ -31,7 +31,6 @@ const RegistrationForm: React.FC = () => {
           alert(replyJson.message) //以后改一个状态条，优雅一点
       }
     }).catch((e) => console.log(e))
-    // 在这里可以处理用户注册逻辑，比如发送请求到服务器
   };
 
 
@@ -39,7 +38,7 @@ const RegistrationForm: React.FC = () => {
     <Row justify="center" align="middle" style={{ height: '100vh' }}>
       <Col span={8}>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          AdminLogin
+          管理员登录
         </Title>
         <Form
           name="admin_login_form"
@@ -48,16 +47,16 @@ const RegistrationForm: React.FC = () => {
           scrollToFirstError
         >
           <Form.Item
-            name="userName"
+            name="admin_id"
             rules={[
               {
                 required: true,
-                message: 'Please input your username!',
+                message: '请输入账号！',
               },
             ]}
           >
             <Input
-              placeholder="Enter your username"
+              placeholder="请输入账号"
               prefix={<UserOutlined className="site-form-item-icon" />}
             />
           </Form.Item>
@@ -67,19 +66,19 @@ const RegistrationForm: React.FC = () => {
             rules={[
               {
                 required: true,
-                message: 'Please input your password!',
+                message: '请输入密码！',
               },
             ]}
           >
             <Input.Password
-              placeholder="Input password"
+              placeholder="请输入密码"
               iconRender={(visible) => (visible ? <LockOutlined /> : <LockOutlined />)}
             />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-              Register
+              登录
             </Button>
           </Form.Item>
         </Form>
