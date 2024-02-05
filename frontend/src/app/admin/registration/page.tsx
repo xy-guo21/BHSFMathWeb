@@ -40,7 +40,7 @@ const RegistrationForm: React.FC = () => {
 
   const validatePassword = (rule: any, value: string) => {
     if (value && value.length < 6) {
-      return Promise.reject('Password must be at least 6 characters long');
+      return Promise.reject('密码必须不少于6位');
     }
     return Promise.resolve();
   };
