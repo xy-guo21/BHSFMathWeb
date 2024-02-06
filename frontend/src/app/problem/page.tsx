@@ -1,13 +1,12 @@
 'use client'
 import React, { useState } from 'react';
-import { Input, Button, Row, Col, Typography, Tag, Select } from 'antd';
-
+import { Input, Button, Row, Col, Typography, Tag, Select, Divider } from 'antd';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 // 模拟数学竞赛题目数据（中文）
-const mockMathContestQuestions = [
+const mockQuestions = [
     { id: '1', title: '解方程：2x + 5 = 11，求 x 的值', difficulty: 2, topics: ['代数'], source: '数学竞赛 2020' },
     { id: '2', title: '前 10 个质数的和是多少？', difficulty: 5, topics: ['数论'], source: '数学奥林匹克练习' },
     { id: '3', title: '如果一个三角形的角度分别为30°、60°和90°，其边长的比是多少？', difficulty: 3, topics: ['几何'], source: '几何挑战' },
@@ -26,90 +25,153 @@ const mockMathContestQuestions = [
     { id: '20', title: '一个直角三角形中，一个角是45°。如果斜边长度是10厘米，邻边的长度是多少？', difficulty: 3, topics: ['几何'], source: '三角学挑战' },
   ];
   
-
-const ProblemSearch: React.FC = () => {
-  const [questionId, setQuestionId] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<number | undefined>(undefined);
-  const [selectedSource, setSelectedSource] = useState('');
-  const [question, setQuestion] = useState<any>(null); // Updated type
-
-  const handleSearch = () => {
-    // Simulate fetching question from a database by criteria
-    const foundQuestion = mockMathContestQuestions.find(q =>
-      (q.id === questionId || !questionId) &&
-      (q.topics.includes(selectedTopic) || !selectedTopic) &&
-      (q.difficulty === selectedDifficulty || selectedDifficulty === undefined) &&
-      (q.source === selectedSource || !selectedSource)
+  
+  const ProblemSearch: React.FC = () => {
+    const [searchMode, setSearchMode] = useState<'id' | 'filter'>('id');
+    const [questionId, setQuestionId] = useState('');
+    const [selectedTopic, setSelectedTopic] = useState('');
+    const [selectedDifficulty, setSelectedDifficulty] = useState<number | undefined>(undefined);
+    const [selectedSource, setSelectedSource] = useState('');
+    const [questionById, setQuestionById] = useState(null);
+    const [questionByFilter, setQuestionByFilter] = useState(null);
+  
+    const handleIdSearch = () => {
+      // Simulate fetching question from a database by ID
+      const foundQuestion = mockQuestions.find(q => q.id === questionId);
+      setQuestionById(foundQuestion);
+    };
+  
+    const handleFilterSearch = () => {
+      // Simulate fetching questions from a database by topic, difficulty, and source
+      const foundQuestions = mockQuestions.filter(q =>
+        (selectedTopic === '' || selectedTopic === '不限' || q.topics.includes(selectedTopic)) &&
+        (selectedDifficulty === undefined || selectedDifficulty === '不限' || q.difficulty === selectedDifficulty) &&
+        (selectedSource === '' || selectedSource === '不限' || q.source === selectedSource)
+      );
+      setQuestionByFilter(foundQuestions);
+    };
+  
+    const switchToIdMode = () => {
+      setSearchMode('id');
+    };
+  
+    const switchToFilterMode = () => {
+      setSearchMode('filter');
+    };
+  
+    return (
+      <Row justify="center" align="middle" style={{ height: '100vh' }}>
+        <Col span={16}>
+          <Row justify="center" gutter={16}>
+            {/* Switch Buttons */}
+            <Col span={24} style={{ marginBottom: '1rem', textAlign: 'center' }}>
+              <Button type={searchMode === 'id' ? 'primary' : 'default'} onClick={switchToIdMode} style={{ marginRight: '1rem' }}>
+                题号搜索
+              </Button>
+              <Button type={searchMode === 'filter' ? 'primary' : 'default'} onClick={switchToFilterMode}>
+                过滤器搜索
+              </Button>
+            </Col>
+  
+            {/* Left Side: Search by ID */}
+            {searchMode === 'id' && (
+              <Col span={12}>
+                <Title level={2} style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                  题号搜索
+                </Title>
+                <Input
+                  placeholder="请输入题目ID"
+                  value={questionId}
+                  onChange={(e) => setQuestionId(e.target.value)}
+                  style={{ marginBottom: '1rem' }}
+                />
+                <Button type="primary" onClick={handleIdSearch} style={{ width: '100%', marginBottom: '1rem' }}>
+                  搜索
+                </Button>
+                {questionById && (
+                  <div style={{ marginTop: '2rem' }}>
+                    <Title level={5}>{`${questionById.id}: ${questionById.title}`}</Title>
+                    <p>{`难度: ${questionById.difficulty}`}</p>
+                    <p>{`来源: ${questionById.source}`}</p>
+                    <p>
+                      类别: {questionById.topics.map((topic, index) => (
+                        <Tag key={index}>{topic}</Tag>
+                      ))}
+                    </p>
+                  </div>
+                )}
+              </Col>
+            )}
+  
+            {/* Right Side: Search by Filter */}
+            {searchMode === 'filter' && (
+              <Col span={12}>
+                <Title level={2} style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                  过滤器搜索
+                </Title>
+                <Select
+                  showSearch
+                  style={{ width: '100%', marginBottom: '1rem' }}
+                  placeholder="请选择类别"
+                  optionFilterProp="children"
+                  onChange={(value) => setSelectedTopic(value)}
+                >
+                  <Option value="不限">不限</Option>
+                  {mockQuestions.flatMap(question => question.topics).filter((value, index, self) => self.indexOf(value) === index).map((topic, index) => (
+                    <Option key={index} value={topic}>{topic}</Option>
+                  ))}
+                </Select>
+                <Select
+                  style={{ width: '100%', marginBottom: '1rem' }}
+                  placeholder="请选择难度"
+                  onChange={(value) => setSelectedDifficulty(value)}
+                >
+                  <Option value="不限">不限</Option>
+                  {[1, 2, 3, 4, 5, 6, 7].map((difficulty, index) => (
+                    <Option key={index} value={difficulty}>{difficulty}</Option>
+                  ))}
+                </Select>
+                <Select
+                  showSearch
+                  style={{ width: '100%', marginBottom: '1rem' }}
+                  placeholder="请选择来源"
+                  optionFilterProp="children"
+                  onChange={(value) => setSelectedSource(value)}
+                >
+                  <Option value="不限">不限</Option>
+                  {mockQuestions.flatMap(question => question.source).filter((value, index, self) => self.indexOf(value) === index).map((source, index) => (
+                    <Option key={index} value={source}>{source}</Option>
+                  ))}
+                </Select>
+                <Button type="primary" onClick={handleFilterSearch} style={{ width: '100%' }}>
+                  搜索
+                </Button>
+                {questionByFilter && (
+                  <div style={{ marginTop: '2rem' }}>
+                    <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+                        找到 {questionByFilter.length} 道符合要求的题目
+                    </p>
+                    {questionByFilter.map((q, index) => (
+                      <div key={index}>
+                        <Title level={5}>{`${q.id}: ${q.title}`}</Title>
+                        <p>{`难度: ${q.difficulty}`}</p>
+                        <p>{`来源: ${q.source}`}</p>
+                        <p>
+                          类别: {q.topics.map((topic, index) => (
+                            <Tag key={index}>{topic}</Tag>
+                          ))}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Col>
+            )}
+          </Row>
+        </Col>
+      </Row>
     );
-    setQuestion(foundQuestion);
   };
-
-  return (
-    <Row justify="center" align="middle" style={{ height: '100vh' }}>
-      <Col span={8}>
-        <Title level={2} style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          题目搜索
-        </Title>
-        <Input
-          placeholder="输入题目ID"
-          value={questionId}
-          onChange={(e) => setQuestionId(e.target.value)}
-          style={{ marginBottom: '1rem' }}
-        />
-        <Select
-          showSearch
-          style={{ width: '100%', marginBottom: '1rem' }}
-          placeholder="选择题目类别"
-          optionFilterProp="children"
-          onChange={(value) => setSelectedTopic(value)}
-        >
-          {mockMathContestQuestions.flatMap(question => question.topics).filter((value, index, self) => self.indexOf(value) === index).map((topic, index) => (
-            <Option key={index} value={topic}>{topic}</Option>
-          ))}
-        </Select>
-        <Select
-          style={{ width: '100%', marginBottom: '1rem' }}
-          placeholder="选择题目难度（1-7）"
-          onChange={(value) => setSelectedDifficulty(value)}
-        >
-          {[1, 2, 3, 4, 5, 6, 7].map((difficulty, index) => (
-            <Option key={index} value={difficulty}>{difficulty}</Option>
-          ))}
-        </Select>
-        <Select
-          showSearch
-          style={{ width: '100%', marginBottom: '1rem' }}
-          placeholder="选择题目来源"
-          optionFilterProp="children"
-          onChange={(value) => setSelectedSource(value)}
-        >
-          {mockMathContestQuestions.flatMap(question => question.source).filter((value, index, self) => self.indexOf(value) === index).map((source, index) => (
-            <Option key={index} value={source}>{source}</Option>
-          ))}
-        </Select>
-        <Button type="primary" onClick={handleSearch} style={{ width: '100%' }}>
-          搜索
-        </Button>
-        {question && (
-          <div style={{ marginTop: '2rem' }}>
-            <Title level={3}>搜索结果</Title>
-            <div>
-              <Title level={4}>{`题目ID: ${question.id}`}</Title>
-              <Title level={5}>{`标题: ${question.title}`}</Title>
-              <p>{`难度: ${question.difficulty}`}</p>
-              <p>{`来源: ${question.source}`}</p>
-              <p>
-                类别: {question.topics.map((topic: string, index: number) => (
-                  <Tag key={index}>{topic}</Tag>
-                ))}
-              </p>
-            </div>
-          </div>
-        )}
-      </Col>
-    </Row>
-  );
-};
-
-export default ProblemSearch;
+  
+  export default ProblemSearch;
+  
