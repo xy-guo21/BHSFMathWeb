@@ -1,6 +1,10 @@
 'use client'
 import React, { useState } from 'react';
 import { Input, Button, Row, Col, Typography, Tag, Select, Divider } from 'antd';
+import { DEBUG_NO_BACKEND } from '../Global/self_setting';
+import { APIUrl } from '../../../public/GlobalVariables';
+import { SERVER_ROOT_URL } from '../Global/url';
+import { ProblemQueryFilterMessage, ProblemQueryIDMessage } from './ProblemQueryMessage';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -37,18 +41,39 @@ const mockQuestions = [
   
     const handleIdSearch = () => {
       // Simulate fetching question from a database by ID
-      const foundQuestion = mockQuestions.find(q => q.id === questionId);
-      setQuestionById(foundQuestion);
+      if (DEBUG_NO_BACKEND){
+        const foundQuestion = mockQuestions.find(q => q.id === questionId);
+        setQuestionById(foundQuestion);
+        return
+      }
+      fetch(SERVER_ROOT_URL + 'problem', {
+        method: "POST", 
+        headers: {"Content-Type":"text/plain"},
+        body: JSON.stringify(new ProblemQueryIDMessage(questionId))
+      }).then(response=> response.json()).then( replyJson =>{
+        setQuestionById(replyJson)
+      })
     };
   
     const handleFilterSearch = () => {
       // Simulate fetching questions from a database by topic, difficulty, and source
-      const foundQuestions = mockQuestions.filter(q =>
-        (selectedTopic === '' || selectedTopic === '不限' || q.topics.includes(selectedTopic)) &&
-        (selectedDifficulty === undefined || selectedDifficulty === '不限' || q.difficulty === selectedDifficulty) &&
-        (selectedSource === '' || selectedSource === '不限' || q.source === selectedSource)
-      );
-      setQuestionByFilter(foundQuestions);
+      if (DEBUG_NO_BACKEND){
+        const foundQuestions = mockQuestions.filter(q =>
+          (selectedTopic === '' || selectedTopic === '不限' || q.topics.includes(selectedTopic)) &&
+          (selectedDifficulty === undefined || selectedDifficulty === '不限' || q.difficulty === selectedDifficulty) &&
+          (selectedSource === '' || selectedSource === '不限' || q.source === selectedSource)
+        );
+        setQuestionByFilter(foundQuestions);
+        return
+      }
+      fetch(SERVER_ROOT_URL + 'problem', {
+        method: "POST", 
+        headers: {"Content-Type":"text/plain"},
+        body: JSON.stringify(new ProblemQueryFilterMessage(selectedTopic, selectedDifficulty, selectedSource))
+      }).then(response=> response.json()).then( replyJson =>{
+        setQuestionByFilter(replyJson)
+      })
+
     };
   
     const switchToIdMode = () => {
