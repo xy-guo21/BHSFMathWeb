@@ -4,10 +4,22 @@ from django.http import JsonResponse
 
 from account.models import Student
 
+# create an example
+if not Student.objects.filter(id=1):
+    Student.objects.create(
+        studentID = 202400001,
+        userName = "Alice",
+        password = "123456",
+        schoolName = "北京四中",
+        enrollmentYear = 2024,
+        studyPeriod = "高中"
+    )
+
 
 # Create your views here.
-def home(request):
-    return JsonResponse({"message": "Hello world!"}, status=200)
+def home(req: HttpRequest):
+    Alice = Student.objects.filter(id=1).first()
+    return JsonResponse(Alice.serialize(), status=200)
 
 def login(req: HttpRequest):
     # user login
