@@ -1,21 +1,61 @@
 import json
-from django.shortcuts import render
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpRequest
+from django.http import JsonResponse
 
+from account.models import Student
 
 
 # Create your views here.
 def home(request):
-    return HttpResponse("Hello world, Django!")
+    return JsonResponse({"message": "Hello world!"}, status=200)
 
 def login(req: HttpRequest):
     # user login
     if req.method == "POST":
         body = json.loads(req.body.decode("utf-8"))
-        ... 
+        studentID = body.get("studentID")
+        password = body.get("password")
+
+        # check if the studentID and password are correct
+        student = Student.objects.filter(studentID=studentID).first()
+        if not student:
+            return JsonResponse({"error": "Invalid studentID"}, status=400)
+        if student.password != password:
+            return JsonResponse({"error": "Invalid password"}, status=400)
+        
+        return JsonResponse(student.serialize(), status=200)
+    
+    else:
+        return JsonResponse({"error": "Invalid method"}, status=400)
 
 def register(req: HttpRequest):
     # register, 
     if req.method == "POST":
         body = json.loads(req.body.decode("utf-8"))
-        ... 
+        userName = body.get("userName")
+        studentID = body.get("studentID")
+        password = body.get("password")
+        schoolName = body.get("schoolName")
+        enrollmentYear = body.get("enrollmentYear")
+        studyPeriod = body.get("studyPeriod")
+
+        # check studentID
+        student = Student.objects.filter(studentID=studentID).first()
+        if student:
+            return JsonResponse({"error": "studentID already exists"}, status=400)
+        
+        # create a new student
+        student = Student(
+            studentID=studentID,
+            userName=userName,
+            password=password,
+            schoolName=schoolName,
+            enrollmentYear=enrollmentYear,
+            studyPeriod=studyPeriod
+        )
+        student.save()
+
+        return JsonResponse(student.serialize(), status=200)
+
+    else:
+        return JsonResponse({"error": "Invalid method"}, status=400)
