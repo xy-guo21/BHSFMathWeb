@@ -3,5 +3,5 @@ import problem.views as views
 
 urlpatterns = [
     path("problemQueryFilter", views.problemQueryFilter),
-    path("problemQuery", views.problemQueryID),
+    path("problemQueryID", views.problemQueryID),
 ]
