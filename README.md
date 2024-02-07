@@ -13,6 +13,10 @@ In `frontend/` dir
    ```
    npx @next/codemod new-link .
    ```
+4. zustand
+   ```
+   npm install zustand
+   ```
 ## Backend Start
 ```
 python manage.py runserver
