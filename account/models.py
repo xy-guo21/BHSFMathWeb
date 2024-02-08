@@ -19,3 +19,13 @@ class Student(models.Model):
             "enrollmentYear": self.enrollmentYear,
             "studyPeriod": self.studyPeriod,
         }
+
+class Admin(models.Model):
+    adminID = models.IntegerField(unique=True)
+    password = models.CharField(max_length=50)
+
+    def serialize(self):
+        return {
+            "adminID" : self.adminID,
+            "password": self.password,
+        }

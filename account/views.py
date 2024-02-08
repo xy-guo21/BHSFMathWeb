@@ -1,10 +1,21 @@
 import json
 from django.http import HttpRequest
-from django.http import JsonResponse
 
-from account.models import Student
+from utils.utils_request import BAD_METHOD, request_failed, request_success, return_field
+from utils.utils_require import CheckRequire, require
+from utils.utils_time import get_timestamp
 
-# create an example
+from account.models import Student, Admin
+from problem.models import Problem
+
+# create a Admin
+if not Admin.objects.filter(id=1):
+    Admin.objects.create(
+        adminID = 1,
+        password = "123456",
+    )
+
+# create a student
 if not Student.objects.filter(id=1):
     Student.objects.create(
         studentID = 202400001,
@@ -18,8 +29,12 @@ if not Student.objects.filter(id=1):
 
 # Create your views here.
 def home(req: HttpRequest):
-    Alice = Student.objects.filter(id=1).first()
-    return JsonResponse(Alice.serialize(), status=200)
+    studentID = req.COOKIES.get("id")
+    student = Student.objects.filter(studentID=studentID).first()
+    if not student:
+        return request_failed("Not logged in")
+    return request_success(student.serialize())
+
 
 def login(req: HttpRequest):
     # user login
@@ -31,14 +46,18 @@ def login(req: HttpRequest):
         # check if the studentID and password are correct
         student = Student.objects.filter(studentID=studentID).first()
         if not student:
-            return JsonResponse({"error": "Invalid studentID"}, status=400)
+            return request_failed("Invalid studentID")
         if student.password != password:
-            return JsonResponse({"error": "Invalid password"}, status=400)
+            return request_failed("Invalid password")
         
-        return JsonResponse(student.serialize(), status=200)
+        return request_success(
+            need_cookie=True,
+            id=student.studentID,
+            password=student.password,
+        )
     
     else:
-        return JsonResponse({"error": "Invalid method"}, status=400)
+        return BAD_METHOD
 
 def register(req: HttpRequest):
     # register, 
@@ -54,7 +73,7 @@ def register(req: HttpRequest):
         # check studentID
         student = Student.objects.filter(studentID=studentID).first()
         if student:
-            return JsonResponse({"error": "studentID already exists"}, status=400)
+            return request_failed("StudentID already exists")
         
         # create a new student
         student = Student(
@@ -67,7 +86,34 @@ def register(req: HttpRequest):
         )
         student.save()
 
-        return JsonResponse(student.serialize(), status=200)
+        return request_success(
+            need_cookie=True,
+            id=student.studentID,
+            password=student.password,
+        )
 
     else:
-        return JsonResponse({"error": "Invalid method"}, status=400)
+        return BAD_METHOD
+    
+def adminLogin(req: HttpRequest):
+    # admin login
+    if req.method == "POST":
+        body = json.loads(req.body.decode("utf-8"))
+        adminID = body.get("adminID")
+        password = body.get("password")
+
+        # check if the adminID and password are correct
+        admin = Admin.objects.filter(adminID=adminID).first()
+        if not admin:
+            return request_failed("Invalid adminID")
+        if admin.password != password:
+            return request_failed("Invalid password")
+        
+        return request_success(
+            need_cookie=True,
+            id=admin.adminID,
+            password=admin.password,
+        )
+    
+    else:
+        return BAD_METHOD
