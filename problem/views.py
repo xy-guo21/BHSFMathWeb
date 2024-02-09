@@ -9,17 +9,17 @@ from utils.utils_time import get_timestamp
 
 from problem.models import Problem
 
-# create an example
-if not Problem.objects.filter(id=1):
-    problem_0 = Problem.objects.create(
-        title = "解方程：2x + 5 = 11，求 x 的值",
-        content = "解方程：2x + 5 = 11，求 x 的值",
-        answer = "x = 3",
-        difficulty = 2,
-        source = "数学竞赛 2020",
-        creator = 1
-    )
-    problem_0.topics.add("代数")
+# # create an example
+# if not Problem.objects.filter(id=1):
+#     problem_0 = Problem.objects.create(
+#         title = "解方程：2x + 5 = 11，求 x 的值",
+#         content = "解方程：2x + 5 = 11，求 x 的值",
+#         answer = "x = 3",
+#         difficulty = 2,
+#         source = "数学竞赛 2020",
+#         creator = 1
+#     )
+#     problem_0.topics.add("代数")
 
 # Create your views here.
 def problemQueryID(req: HttpRequest):

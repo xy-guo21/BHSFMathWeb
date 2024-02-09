@@ -23,7 +23,9 @@ pip install -r requirements.txt
 ```
 
 ```
-python manage.py makemigrations
-python manage.py migrate
+python manage.py makemigrations problem
+python manage.py makemigrations account
+python manage.py migrate problem
+python manage.py migrate account
 python manage.py runserver
 ```

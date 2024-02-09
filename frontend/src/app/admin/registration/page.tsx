@@ -24,13 +24,13 @@ const RegistrationForm: React.FC = () => {
       alert("添加用户成功")
       return
     }
-    fetch(SERVER_ROOT_URL+'admin/registration',{
+    fetch(SERVER_ROOT_URL+'register',{
       method: "POST", 
       headers:{"Content-Type":"text/plain"},
       body: JSON.stringify(new ResgisterUserMessage(values.username, values.student_id, values.password, values.enrollment, values.school[0], values.school[1]))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
-      if (replyJson.status === 0) {
+      if (replyJson.status === 200) {
           alert("添加用户成功")
       } else {
           alert(replyJson.message) //以后改一个状态条，优雅一点

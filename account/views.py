@@ -8,23 +8,23 @@ from utils.utils_time import get_timestamp
 from account.models import Student, Admin
 from problem.models import Problem
 
-# create a Admin
-if not Admin.objects.filter(id=1):
-    Admin.objects.create(
-        adminID = 1,
-        password = "123456",
-    )
+# # create a Admin
+# if not Admin.objects.filter(id=1):
+#     Admin.objects.create(
+#         adminID = 1,
+#         password = "123456",
+#     )
 
-# create a student
-if not Student.objects.filter(id=1):
-    Student.objects.create(
-        studentID = 202400001,
-        userName = "Alice",
-        password = "123456",
-        schoolName = "北京四中",
-        enrollmentYear = 2024,
-        studyPeriod = "高中"
-    )
+# # create a student
+# if not Student.objects.filter(id=1):
+#     Student.objects.create(
+#         studentID = 202400001,
+#         userName = "Alice",
+#         password = "123456",
+#         schoolName = "北京四中",
+#         enrollmentYear = 2024,
+#         studyPeriod = "高中"
+#     )
 
 
 # Create your views here.

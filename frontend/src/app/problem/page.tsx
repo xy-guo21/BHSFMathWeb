@@ -46,12 +46,13 @@ const mockQuestions = [
         setQuestionById(foundQuestion);
         return
       }
-      fetch(SERVER_ROOT_URL + 'problem', {
+      fetch(SERVER_ROOT_URL + 'problemQueryID', {
         method: "POST", 
         headers: {"Content-Type":"text/plain"},
         body: JSON.stringify(new ProblemQueryIDMessage(questionId))
       }).then(response=> response.json()).then( replyJson =>{
-        setQuestionById(replyJson)
+        // setQuestionById(replyJson)
+        console.log(replyJson)
       })
     };
   
@@ -66,12 +67,13 @@ const mockQuestions = [
         setQuestionByFilter(foundQuestions);
         return
       }
-      fetch(SERVER_ROOT_URL + 'problem', {
+      fetch(SERVER_ROOT_URL + 'problemQueryFilter', {
         method: "POST", 
         headers: {"Content-Type":"text/plain"},
         body: JSON.stringify(new ProblemQueryFilterMessage(selectedTopic, selectedDifficulty, selectedSource))
       }).then(response=> response.json()).then( replyJson =>{
-        setQuestionByFilter(replyJson)
+        console.log(replyJson)
+        // setQuestionByFilter(replyJson)
       })
 
     };
