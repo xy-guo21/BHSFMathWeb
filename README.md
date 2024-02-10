@@ -8,6 +8,7 @@ In `frontend/` dir
 2. antd
     ```
     npm install antd --save
+    npm install @ant-design/nextjs-registry --save
     ```
 3. link
    ```
