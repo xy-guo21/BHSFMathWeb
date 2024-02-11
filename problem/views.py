@@ -114,3 +114,46 @@ def uploadProblem(req: HttpRequest):
     
     else:
         return BAD_METHOD
+    
+
+def uploadSolution(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            body = json.loads(req.body.decode("utf-8"))
+            problemID = body.get("problemID")
+            content = body.get("content")
+            answerImage = req.FILES.get('answerImage')
+            
+            assert content or answerImage, "Content or image is required."
+
+            problem = Problem.objects.filter(id=problemID).first()
+            if not problem:
+                return request_failed("Problem not exists")
+
+            if content:
+                # if problem.answer:
+                #     existing_answers = json.loads(problem.answer)
+                # else:
+                #     existing_answers = []
+                # existing_answers.append(content)
+                # problem.answer = json.dumps(existing_answers)
+                problem.answer = content
+
+            if answerImage:
+                # if problem.answerImage:
+                #     existing_answer_images = json.loads(problem.answerImage)
+                # else:
+                #     existing_answer_images = []
+                # existing_answer_images.append(answerImage)
+                # problem.answerImage = json.dumps(existing_answer_images)
+                problem.answerImage = answerImage
+
+            problem.save()
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
