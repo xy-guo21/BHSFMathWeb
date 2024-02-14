@@ -8,14 +8,14 @@ class Problem(models.Model):
     content = models.TextField(blank=True, null=True)
     answer = models.TextField(blank=True, null=True)
 
-    creator = models.IntegerField(blank=True, null=True)
+    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE, related_name="createdProblem", blank=True, null=True)
     createTime = models.DateTimeField(auto_now_add=True)
 
     topics = TaggableManager(blank=True)
     source = models.TextField(blank=True, null=True)
 
     difficulty = models.IntegerField(blank=True, null=True)
-    stars = models.ManyToManyField(to='Student', related_name="starredProblem", blank=True)
+    stars = models.ManyToManyField(to='account.Student', related_name="starredProblem", blank=True)
 
     image = models.ImageField(upload_to="problemImages", blank=True, null=True)
     answerImage = models.ImageField(upload_to="problemImages", blank=True, null=True)
@@ -27,7 +27,7 @@ class Problem(models.Model):
             "problemTitle": self.title, # "problemTitle" is a typo, but it's used in the frontend
             "content": self.content,
             "answer": self.answer,
-            "userID": self.creator,
+            "userID": self.creator.studentID,
             "createTime": self.createTime,
             "topics": [topic.name for topic in self.topics.all()],
             "source": self.source,
@@ -52,12 +52,12 @@ class Comment(models.Model):
     problem = models.ForeignKey(to=Problem, on_delete=models.CASCADE)
     content = models.TextField()
     image = models.ImageField(upload_to="commentImages", blank=True, null=True)
-    creator = models.ForeignKey(to='Student', on_delete=models.CASCADE)
+    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
     createTime = models.DateTimeField(auto_now_add=True)
     commentTo = models.ForeignKey(to='self', on_delete=models.CASCADE, blank=True, null=True)
 
-    likes = models.ManyToManyField(to='Student', related_name="likedComment", blank=True)
-    dislikes = models.ManyToManyField(to='Student', related_name="dislikedComment", blank=True)
+    likes = models.ManyToManyField(to='account.Student', related_name="likedComment", blank=True)
+    dislikes = models.ManyToManyField(to='account.Student', related_name="dislikedComment", blank=True)
 
     def serialize(self):
         return {
