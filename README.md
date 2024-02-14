@@ -1,23 +1,15 @@
 # BHSFMathWeb
 ## Frontend Install
 In `frontend/` dir
-1. main project
+1. install
+   ```
+   npm install
+   ```
+2. main project
    ```
    npm run dev
    ```
-2. antd
-    ```
-    npm install antd --save
-    npm install @ant-design/nextjs-registry --save
-    ```
-3. link
-   ```
-   npx @next/codemod new-link .
-   ```
-4. zustand
-   ```
-   npm install zustand
-   ```
+
 ## Backend Start
 ```
 pip install -r requirements.txt

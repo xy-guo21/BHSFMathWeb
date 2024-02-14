@@ -27,7 +27,7 @@ const LoginForm: React.FC = () => {
       body: JSON.stringify(new UserLoginMessage(values.student_id, values.password))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
-      if (replyJson.status === 0) {
+      if (replyJson.status === 200) {
           setUserToken(replyJson.message)
           router.push("home");
       } else {
