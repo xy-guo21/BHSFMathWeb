@@ -1,10 +1,12 @@
 'use client'
 import React, { useState } from 'react';
 import { Input, Button, Row, Col, Typography, Tag, Select, Divider } from 'antd';
+import { BrowserRouter as Router, Link } from 'react-router-dom';
 import { DEBUG_NO_BACKEND } from '../Global/self_setting';
 import { APIUrl } from '../../../public/GlobalVariables';
 import { SERVER_ROOT_URL } from '../Global/url';
 import { ProblemQueryFilterMessage, ProblemQueryIDMessage } from './ProblemQueryMessage';
+import { useRouter } from 'next/navigation';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -31,6 +33,7 @@ const mockQuestions = [
   
   
   const ProblemSearch: React.FC = () => {
+    const router = useRouter()
     const [searchMode, setSearchMode] = useState<'id' | 'filter'>('id');
     const [questionId, setQuestionId] = useState('');
     const [selectedTopic, setSelectedTopic] = useState('');
@@ -117,14 +120,15 @@ const mockQuestions = [
                 </Button>
                 {questionById && (
                   <div style={{ marginTop: '2rem' }}>
-                    <Title level={5}>{`${questionById.id}: ${questionById.title}`}</Title>
-                    <p>{`难度: ${questionById.difficulty}`}</p>
-                    <p>{`来源: ${questionById.source}`}</p>
-                    <p>
-                      类别: {questionById.topics.map((topic, index) => (
-                        <Tag key={index}>{topic}</Tag>
-                      ))}
-                    </p>
+                    <div style={{ flex: 1 }}>
+                      {/* 显示题目内容的缩略 */}
+                      <Title level={5}>{`${questionById.id}: ${questionById.title.slice(0, 10)}${questionById.title.length > 10 ? '...' : ''}`}</Title>
+                    </div>
+                    {/* 添加查看详情按钮 */}
+                    <Button onClick={()=>{router.push('/problem/'+questionById.id)}}>查看详情</Button>
+                    {/* <Router> */}
+                      {/* <Link to={`/problem/${questionById.id}`} style={{ marginLeft: '1rem' }}>查看详情</Link> */}
+                    {/* </Router> */}
                   </div>
                 )}
               </Col>
@@ -179,16 +183,14 @@ const mockQuestions = [
                         找到 {questionByFilter.length} 道符合要求的题目
                     </p>
                     {questionByFilter.map((q, index) => (
-                      <div key={index}>
-                        <Title level={5}>{`${q.id}: ${q.title}`}</Title>
-                        <p>{`难度: ${q.difficulty}`}</p>
-                        <p>{`来源: ${q.source}`}</p>
-                        <p>
-                          类别: {q.topics.map((topic, index) => (
-                            <Tag key={index}>{topic}</Tag>
-                          ))}
-                        </p>
-                      </div>
+                      <div key={index} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center' }}>
+                        <div style={{ flex: 1 }}>
+                          <Title level={5}>{`${q.id}:${q.title.slice(0, 10)}${q.title.length > 10 ? '...' : ''}`}</Title>
+                        </div>  
+                        <Router>
+                          <Link to={`/problem/${q.id}`}>查看详情</Link>
+                        </Router>
+                      </div>                      
                     ))}
                   </div>
                 )}
