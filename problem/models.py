@@ -46,6 +46,7 @@ class Problem(models.Model):
             self.stars.remove(student)
         else:
             self.stars.add(student)
+    
 
 
 class Comment(models.Model):
@@ -79,3 +80,12 @@ class Comment(models.Model):
     def dislike(self, student: Student):
         self.dislikes.add(student)
         self.likes.remove(student)
+
+class Scoring(models.Model):
+    student = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    problem = models.ForeignKey(to=Problem, on_delete=models.CASCADE)
+    score = models.IntegerField()
+
+    def refresh(self, score: int):
+        self.score = score
+        self.save()
