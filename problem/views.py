@@ -7,7 +7,7 @@ from utils.utils_require import CheckRequire, require
 from utils.utils_time import get_timestamp
 
 from account.models import Student, Admin
-from problem.models import Problem, Comment
+from problem.models import Problem, Comment, Scoring, ProblemBox, Paper
 
 
 # Create your views here.
@@ -209,6 +209,63 @@ def starProblem(req: HttpRequest):
     else:
         return BAD_METHOD
 
+def scoreProblem(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            problemID = body.get("problemID")
+            problem = Problem.objects.filter(id=problemID).first()
+            assert problem, "Problem not exists"
+
+            score = body.get("score")
+            assert score, "Score is required"
+            assert 0 <= score <= 10, "Score should be between 0 and 10"
+
+            scoring = Scoring.objects.filter(student=student, problem=problem).first()
+            if scoring:
+                scoring.refresh(score=score)
+            else:
+                Scoring.objects.create(student=student, problem=problem, score=score)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+
+def deleteProblem(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            problemID = body.get("problemID")
+            problem = Problem.objects.filter(id=problemID).first()
+            assert problem, "Problem not exists"
+            assert student == problem.creator, "Not the creator of the problem"
+
+            problem.delete()
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+'''
+====================== Comment ======================
+'''
+
 def uploadComment(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -231,14 +288,14 @@ def uploadComment(req: HttpRequest):
                 assert commentTo, "Comment to not exists"
                 
             # create a new comment
-            comment = Comment(
+            Comment.objects.create(
                 problem = problem,
                 content = commentText,
                 image = commentImage,
                 creator = student,
                 commentTo = commentTo
             )
-            comment.save()
+
             return request_success()
         
         except Exception as e:
@@ -301,6 +358,274 @@ def dislikeComment(req: HttpRequest):
             assert comment, "Comment not exists"
 
             comment.dislike(student)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def deleteComment(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Admin.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            commentID = body.get("commentID")
+            comment = Comment.objects.filter(id=commentID).first()
+            assert comment, "Comment not exists"
+            assert student == comment.creator, "Not the creator of the comment"
+
+            comment.delete()
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+'''
+====================== Problem Box ======================
+'''
+
+def queryProblemBox(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            problemBox = ProblemBox.objects.filter(student=student).first()
+            if not problemBox:
+                problemBox = ProblemBox(student=student)
+                problemBox.save()
+
+            return request_success(problemBox.serialize())
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def addToProblemBox(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            problemID = body.get("problemID")
+            problem = Problem.objects.filter(id=problemID).first()
+            assert problem, "Problem not exists"
+
+            problemBox = ProblemBox.objects.filter(student=student).first()
+            if not problemBox:
+                problemBox = ProblemBox(student=student)
+                problemBox.save()
+
+            problemBox.add(problem)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def removeFromProblemBox(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            problemID = body.get("problemID")
+            problem = Problem.objects.filter(id=problemID).first()
+            assert problem, "Problem not exists"
+
+            problemBox = ProblemBox.objects.filter(student=student).first()
+            assert problemBox, "Problem box not exists"
+
+            problemBox.remove(problem)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+'''
+====================== Paper ======================
+'''
+    
+def constructPaper(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            title = body.get("title")
+            content = body.get("content")
+            assert title, "Title is required"
+            assert content, "Content is required"
+
+            problemBox = ProblemBox.objects.filter(student=student).first()
+            assert problemBox, "Problem box not exists"
+
+            paper = problemBox.constructPaper(title=title, content=content)
+
+            return request_success({
+                "paperID": paper.id
+            })
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def queryPaperList(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            papers = Paper.objects.all()
+            return request_success({
+                "paperIDs": [paper.id for paper in papers]
+            })
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+
+def queryUserPaperList(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            papers = Paper.objects.filter(creator=student)
+            return request_success({
+                "paperIDs": [paper.id for paper in papers]
+            })
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+
+def queryPaperDetail(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            body = json.loads(req.body.decode("utf-8"))
+            paperID = body.get("paperID")
+            paper = Paper.objects.filter(id=paperID).first()
+            assert paper, "Paper not exists"
+
+            return request_success(paper.serialize())
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def likePaper(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            paperID = body.get("paperID")
+            paper = Paper.objects.filter(id=paperID).first()
+            assert paper, "Paper not exists"
+
+            paper.like(student)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def dislikePaper(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            paperID = body.get("paperID")
+            paper = Paper.objects.filter(id=paperID).first()
+            assert paper, "Paper not exists"
+
+            paper.dislike(student)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+def starPaper(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            paperID = body.get("paperID")
+            paper = Paper.objects.filter(id=paperID).first()
+            assert paper, "Paper not exists"
+
+            paper.star(student)
+
+            return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+
+def deletePaper(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Admin.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in"
+
+            body = json.loads(req.body.decode("utf-8"))
+            paperID = body.get("paperID")
+            paper = Paper.objects.filter(id=paperID).first()
+            assert paper, "Paper not exists"
+            assert student == paper.creator, "Not the creator of the paper"
+
+            paper.delete()
 
             return request_success()
         

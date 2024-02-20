@@ -89,3 +89,64 @@ class Scoring(models.Model):
     def refresh(self, score: int):
         self.score = score
         self.save()
+
+class ProblemBox(models.Model):
+    student = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    problems = models.ManyToManyField(to=Problem, related_name="problemBox", blank=True)
+
+    def serialize(self):
+        return {
+            "studentID": self.student.studentID,
+            "problemIDs": [problem.id for problem in self.problems.all()],
+        }
+    
+    def add(self, problem: Problem):
+        if problem not in self.problems.all():
+            self.problems.add(problem)
+    
+    def remove(self, problem: Problem):
+        if problem in self.problems.all():
+            self.problems.remove(problem)
+    
+    def constructPaper(self, title: str, content: str):
+        paper = Paper(title=title, content=content, creator=self.student)
+        paper.save()
+        for problem in self.problems.all():
+            paper.add(problem)
+        return paper
+
+class Paper(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    createTime = models.DateTimeField(auto_now_add=True)
+
+    problems = models.ManyToManyField(to=Problem, related_name="papers", blank=True)
+
+    likes = models.ManyToManyField(to='account.Student', related_name="likedPaper", blank=True)
+    dislikes = models.ManyToManyField(to='account.Student', related_name="dislikedPaper", blank=True)
+    stars = models.ManyToManyField(to='account.Student', related_name="starredPaper", blank=True)
+
+    def serialize(self):
+        return {
+            "paperID": self.id,
+            "paperName": self.title,
+            "description": self.content,
+            "creatorID": self.creator.studentID,
+            "createTime": self.createTime,
+            "problemIDs": [problem.id for problem in self.problems.all()],
+        }
+    
+    def like(self, student: Student):
+        self.likes.add(student)
+        self.dislikes.remove(student)
+    
+    def dislike(self, student: Student):
+        self.dislikes.add(student)
+        self.likes.remove(student)
+
+    def star(self, student: Student):
+        if student in self.stars.all():
+            self.stars.remove(student)
+        else:
+            self.stars.add(student)
