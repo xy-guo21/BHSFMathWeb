@@ -6,10 +6,14 @@ urlpatterns = [
     path("problemQueryFilter", views.problemQueryFilter),
     path("problemQueryID", views.problemQueryID),
     path("problemQueryDetail", views.problemQueryDetail),
+    path("queryCreatedProblem", views.queryCreatedProblem, name="queryCreatedProblem"),
+    path("queryStarredProblem", views.queryStarredProblem, name="queryStarredProblem"),
 
     # Problem Upload
     path("uploadProblem", views.uploadProblem, name="uploadProblem"),
     path("uploadSolution", views.uploadSolution, name="uploadSolution"),
+
+    # Solution Query
     # path("querySolution", views.querySolution, name="querySolution"),
     path("querySolutions", views.querySolutions, name="querySolutions"),
     path("quertSolutionDetail", views.querySolutionDetail, name="querySolutionDetail"),

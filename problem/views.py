@@ -10,6 +10,11 @@ from account.models import Student, Admin
 from problem.models import Problem, Solution, Comment, Scoring, ProblemBox, Paper
 
 
+'''
+====================== Problem & Solution ======================
+'''
+
+
 # Create your views here.
 def problemQueryID(req: HttpRequest):
      # problem query upon ProblemID
@@ -236,12 +241,12 @@ def starProblem(req: HttpRequest):
         try:
             studentID = req.COOKIES.get("id")
             student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            assert student, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
+            assert problem, "Problem not exists."
 
             problem.star(student)
 
@@ -253,21 +258,22 @@ def starProblem(req: HttpRequest):
     else:
         return BAD_METHOD
 
+
 def scoreProblem(req: HttpRequest):
     if req.method == "POST":
         try:
             studentID = req.COOKIES.get("id")
             student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            assert student, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
+            assert problem, "Problem not exists."
 
             score = body.get("score")
-            assert score, "Score is required"
-            assert 0 <= score <= 10, "Score should be between 0 and 10"
+            assert score, "Score is required."
+            assert 0 <= score <= 10, "Score should be between 0 and 10."
 
             scoring = Scoring.objects.filter(student=student, problem=problem).first()
             if scoring:
@@ -283,18 +289,19 @@ def scoreProblem(req: HttpRequest):
     else:
         return BAD_METHOD
 
+
 def deleteProblem(req: HttpRequest):
     if req.method == "POST":
         try:
             studentID = req.COOKIES.get("id")
             student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            assert student, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
-            assert student == problem.creator, "Not the creator of the problem"
+            assert problem, "Problem not exists."
+            assert student == problem.creator, "Not the creator of the problem."
 
             problem.delete()
 
@@ -306,9 +313,51 @@ def deleteProblem(req: HttpRequest):
     else:
         return BAD_METHOD
     
+
+def queryCreatedProblem(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in."
+
+            created_problem_list = student.createdProblem.all()
+
+            return request_success({
+                "problemIDs": [problem.id for problem in created_problem_list]
+            })
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+
+def queryStarredProblem(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            studentID = req.COOKIES.get("id")
+            student = Student.objects.filter(studentID=studentID).first()
+            assert student, "Not logged in."
+
+            starred_problem_list = student.starredProblem.all()
+
+            return request_success({
+                "problemIDs": [problem.id for problem in starred_problem_list]
+            })
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+
+
 '''
 ====================== Comment ======================
 '''
+
 
 def uploadComment(req: HttpRequest):
     if req.method == "POST":
@@ -347,7 +396,8 @@ def uploadComment(req: HttpRequest):
         
     else:
         return BAD_METHOD
-    
+
+
 def queryComment(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -366,7 +416,8 @@ def queryComment(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def likeComment(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -389,6 +440,7 @@ def likeComment(req: HttpRequest):
     else:
         return BAD_METHOD
 
+
 def dislikeComment(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -410,7 +462,8 @@ def dislikeComment(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def deleteComment(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -433,10 +486,12 @@ def deleteComment(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 '''
 ====================== Problem Box ======================
 '''
+
 
 def queryProblemBox(req: HttpRequest):
     if req.method == "POST":
@@ -457,7 +512,8 @@ def queryProblemBox(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def addToProblemBox(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -484,7 +540,8 @@ def addToProblemBox(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def removeFromProblemBox(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -509,11 +566,13 @@ def removeFromProblemBox(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 '''
 ====================== Paper ======================
 '''
-    
+
+
 def constructPaper(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -541,7 +600,8 @@ def constructPaper(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def queryPaperList(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -555,6 +615,7 @@ def queryPaperList(req: HttpRequest):
     
     else:
         return BAD_METHOD
+
 
 def queryUserPaperList(req: HttpRequest):
     if req.method == "POST":
@@ -574,6 +635,7 @@ def queryUserPaperList(req: HttpRequest):
     else:
         return BAD_METHOD
 
+
 def queryPaperDetail(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -589,7 +651,8 @@ def queryPaperDetail(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def likePaper(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -611,7 +674,8 @@ def likePaper(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def dislikePaper(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -633,7 +697,8 @@ def dislikePaper(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
+
 def starPaper(req: HttpRequest):
     if req.method == "POST":
         try:
@@ -655,6 +720,7 @@ def starPaper(req: HttpRequest):
     
     else:
         return BAD_METHOD
+
 
 def deletePaper(req: HttpRequest):
     if req.method == "POST":
