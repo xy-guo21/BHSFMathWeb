@@ -6,7 +6,7 @@ from account.models import Student
 class Problem(models.Model):
     title = models.CharField(max_length=100, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
-    answer = models.TextField(blank=True, null=True)
+    # answer = models.TextField(blank=True, null=True)
 
     creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE, related_name="createdProblem", blank=True, null=True)
     createTime = models.DateTimeField(auto_now_add=True)
@@ -18,26 +18,26 @@ class Problem(models.Model):
     stars = models.ManyToManyField(to='account.Student', related_name="starredProblem", blank=True)
 
     image = models.ImageField(upload_to="problemImages", blank=True, null=True)
-    answerImage = models.ImageField(upload_to="problemImages", blank=True, null=True)
+    # answerImage = models.ImageField(upload_to="problemImages", blank=True, null=True)
 
     def serialize(self):
         ret = {
             "problemID": self.id,
             "title": self.title,
             "problemTitle": self.title, # "problemTitle" is a typo, but it's used in the frontend
-            "content": self.content,
-            "answer": self.answer,
             "userID": self.creator.studentID,
             "createTime": self.createTime,
+            "content": self.content,
+            "imagePath": self.image.url if self.image else None,
             "topics": [topic.name for topic in self.topics.all()],
             "source": self.source,
             "difficulty": self.difficulty,
-            "imagePath": [],
+            "answers": [solution.id for solution in self.solutions.all()],
         }
-        if self.image:
-            ret["imagePath"] = [self.image.url]
-        if self.answerImage:
-            ret["imagePath"].append(self.answerImage.url)
+        # if self.image:
+        #     ret["imagePath"] = [self.image.url]
+        # if self.answerImage:
+        #     ret["imagePath"].append(self.answerImage.url)
 
         return ret
     
@@ -46,7 +46,24 @@ class Problem(models.Model):
             self.stars.remove(student)
         else:
             self.stars.add(student)
-    
+
+
+class Solution(models.Model):
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='solutions')
+    content = models.TextField(blank=True, null=True)
+    image = models.ImageField(upload_to="solutionImages", blank=True, null=True)
+    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE, related_name="createdSolution", blank=True, null=True)
+    createTime = models.DateTimeField(auto_now_add=True)
+
+    def serialize(self):
+        return {
+            "solutionID": self.id,
+            "problemID": self.problem.id,
+            "creator": self.creator.studentID,
+            "createTime": self.createTime,
+            "content": self.content,
+            "imagePath": self.image.url if self.image else None,
+        }
 
 
 class Comment(models.Model):

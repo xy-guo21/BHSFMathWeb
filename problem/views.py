@@ -7,7 +7,7 @@ from utils.utils_require import CheckRequire, require
 from utils.utils_time import get_timestamp
 
 from account.models import Student, Admin
-from problem.models import Problem, Comment, Scoring, ProblemBox, Paper
+from problem.models import Problem, Solution, Comment, Scoring, ProblemBox, Paper
 
 
 # Create your views here.
@@ -18,7 +18,7 @@ def problemQueryID(req: HttpRequest):
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
+            assert problem, "Problem not exists."
             
             return request_success(problem.serialize())
         except Exception as e:
@@ -66,7 +66,7 @@ def problemQueryDetail(req: HttpRequest):
 
             # fetch the poblem
             problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
+            assert problem, "Problem not exists."
             
             return request_success(problem.serialize())
         except Exception as e:
@@ -81,38 +81,92 @@ def uploadProblem(req: HttpRequest):
         try:
             studentID = req.COOKIES.get("id")
             student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            assert student, "Not logged in."
             
             body = json.loads(req.body.decode("utf-8"))
+            
             # title = body.get("title")
             content = body.get("content")
+            image = req.FILES.get('image')
             assert content, "Content is required."
 
-            answer = body.get("answer")
             # userID = body.get("userID")
             topics = body.get("topics")
             source = body.get("source")
             difficulty = body.get("difficulty")
 
-            image = req.FILES.get('image')
-            answerImage = req.FILES.get('answerImage')
-
             # create a new problem
             problem = Problem(
                 title = content[:20] if len(content) > 20 else content,
                 content = content,
-                answer = answer,
                 creator = studentID,
                 source = source,
                 difficulty = difficulty,
                 image = image,
-                answerImage = answerImage
             )
+            problem.save()
+
             if topics:
                 problem.topics.add(*topics)
             problem.save()
 
+            # create a new solution if answer or answerImage is provided
+            answer = body.get("answer")
+            answerImage = req.FILES.get('answerImage')
+            
+            if answer or answerImage:
+                Solution.objects.create(
+                    problem = problem,
+                    content = answer,
+                    image = answerImage,
+                    creator = student
+                )
+
             return request_success()
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+    
+
+def querySolutions(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            body = json.loads(req.body.decode("utf-8"))
+            problemID = body.get("problemID")
+            assert problemID, "Problem ID is required."
+            
+            problem = Problem.objects.filter(id=problemID).first()
+            assert problem, "Problem not exists."
+            
+            solutions = problem.solutions.all()
+            
+            return request_success({
+                "problemID": problemID,
+                "solutionIDs": [solution.id for solution in solutions]
+            })
+        
+        except Exception as e:
+            return request_failed(str(e))
+    
+    else:
+        return BAD_METHOD
+
+
+def querySolutionDetail(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            body = json.loads(req.body.decode("utf-8"))
+            solutionID = body.get("solutionID")
+            assert solutionID, "solutionID ID is required."
+            
+            solution = Solution.objects.filter(id=solutionID).first()
+            assert solution, "Solution not exists."
+
+            return request_success(solution.serialize())
+        
         except Exception as e:
             return request_failed(str(e))
     
@@ -125,39 +179,27 @@ def uploadSolution(req: HttpRequest):
         try:
             studentID = req.COOKIES.get("id")
             student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            assert student, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
+            assert problemID, "Problem ID is required."
+            
             problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
-            assert student == problem.creator, "Not the creator of the problem"
+            assert problem, "Problem not exists."
+            
+            assert student == problem.creator, "Not the creator of the problem."
 
             content = body.get("content")
             answerImage = req.FILES.get('answerImage')
-            
             assert content or answerImage, "Content or image is required."
 
-
-            if content:
-                # if problem.answer:
-                #     existing_answers = json.loads(problem.answer)
-                # else:
-                #     existing_answers = []
-                # existing_answers.append(content)
-                # problem.answer = json.dumps(existing_answers)
-                problem.answer = content
-
-            if answerImage:
-                # if problem.answerImage:
-                #     existing_answer_images = json.loads(problem.answerImage)
-                # else:
-                #     existing_answer_images = []
-                # existing_answer_images.append(answerImage)
-                # problem.answerImage = json.dumps(existing_answer_images)
-                problem.answerImage = answerImage
-
-            problem.save()
+            Solution.objects.create(
+                problem=problem,
+                content=content,
+                image=answerImage,
+                creator=student
+            )
 
             return request_success()
         
@@ -167,26 +209,28 @@ def uploadSolution(req: HttpRequest):
     else:
         return BAD_METHOD
 
-def querySolution(req: HttpRequest):
-    if req.method == "POST":
-        try:
-            body = json.loads(req.body.decode("utf-8"))
-            problemID = body.get("problemID")
-            problem = Problem.objects.filter(id=problemID).first()
-            assert problem, "Problem not exists"
 
-            return request_success({
-                "problemID": problem.id,
-                "creator": problem.creator,
-                "content": problem.answer,
-                "image": problem.answerImage.url if problem.answerImage else None,
-            })
-        except Exception as e:
-            return request_failed(str(e))
+# def querySolution(req: HttpRequest):
+#     if req.method == "POST":
+#         try:
+#             body = json.loads(req.body.decode("utf-8"))
+#             problemID = body.get("problemID")
+#             problem = Problem.objects.filter(id=problemID).first()
+#             assert problem, "Problem not exists"
+
+#             return request_success({
+#                 "problemID": problem.id,
+#                 "creator": problem.creator,
+#                 "content": problem.answer,
+#                 "image": problem.answerImage.url if problem.answerImage else None,
+#             })
+#         except Exception as e:
+#             return request_failed(str(e))
     
-    else:
-        return BAD_METHOD
-    
+#     else:
+#         return BAD_METHOD
+
+
 def starProblem(req: HttpRequest):
     if req.method == "POST":
         try:

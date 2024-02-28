@@ -10,7 +10,9 @@ urlpatterns = [
     # Problem Upload
     path("uploadProblem", views.uploadProblem, name="uploadProblem"),
     path("uploadSolution", views.uploadSolution, name="uploadSolution"),
-    path("querySolution", views.querySolution, name="querySolution"),
+    # path("querySolution", views.querySolution, name="querySolution"),
+    path("querySolutions", views.querySolutions, name="querySolutions"),
+    path("quertSolutionDetail", views.querySolutionDetail, name="querySolutionDetail"),
 
     path("starProblem", views.starProblem, name="starProblem"),
     path("scoreProblem", views.scoreProblem, name="scoreProblem"),
