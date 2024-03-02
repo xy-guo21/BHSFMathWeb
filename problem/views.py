@@ -494,7 +494,7 @@ def deleteComment(req: HttpRequest):
 
 
 def queryProblemBox(req: HttpRequest):
-    if req.method == "POST":
+    if req.method == "GET":
         try:
             studentID = req.COOKIES.get("id")
             student = Student.objects.filter(studentID=studentID).first()
