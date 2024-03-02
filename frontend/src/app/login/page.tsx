@@ -29,7 +29,7 @@ const LoginForm: React.FC = () => {
       console.log(replyJson)
       if (replyJson.status === 200) {
           setUserToken(replyJson.message)
-          router.push("home");
+          router.push("/home");
       } else {
           alert(replyJson.message) //以后改一个状态条，优雅一点
       }

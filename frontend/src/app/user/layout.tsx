@@ -7,9 +7,11 @@ import {
   ShopOutlined,
   TeamOutlined,
   UploadOutlined,
+  ShoppingCartOutlined, 
   UserOutlined,
   HomeOutlined,
   QuestionCircleOutlined, 
+  StarOutlined, 
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -32,33 +34,50 @@ const { Header, Content, Footer, Sider } = Layout;
 //   icon: React.createElement(icon),
 //   label: `nav ${index + 1}`,
 // }));
-const routingList = ['/home', '/user', '/user/upload_problem', '/user/user_problem']
+const routingList = [
+  '/home', 
+  '/user', 
+  '/user/upload_problem', 
+  '/user/user_problem', 
+  '/user/star_problem',
+  '/user/problem_box',
+]
+
 type MenuItem = Required<MenuProps>['items'][number];
 const items: MenuItem[] = [
     { 
-        key: '/home',
-        icon: React.createElement(HomeOutlined),
-        label: "主页"
+      key: '/home',
+      icon: React.createElement(HomeOutlined),
+      label: "主页"
     },
     {
-        key: '/user', 
-        icon: React.createElement(UserOutlined),
-        label: '个人中心'
+      key: '/user', 
+      icon: React.createElement(UserOutlined),
+      label: '个人中心'
     },
     {
-        key: 'user problem',
-        label: '我的题目',
-        icon: React.createElement(QuestionCircleOutlined), 
-        // type: 'group',
-        children: [{
-            key: '/user/upload_problem',
-            label: '上传题目'
-        }, {
-            key: '/user/user_problem',
-            label: '我的题目'
-        }]
+      key: 'user problem',
+      label: '我的题目',
+      icon: React.createElement(QuestionCircleOutlined), 
+      // type: 'group',
+      children: [{
+          key: '/user/upload_problem',
+          label: '上传题目'
+      }, {
+          key: '/user/user_problem',
+          label: '我的题目'
+      }]
+    },
+    {
+      key: '/user/star_problem',
+      label: '我的收藏',
+      icon: React.createElement(StarOutlined), 
+    },
+    {
+      key: '/user/problem_box',
+      label: '我的试题篮',
+      icon: <ShoppingCartOutlined />
     }
-
 ]
 
 

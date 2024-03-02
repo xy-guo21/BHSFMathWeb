@@ -9,7 +9,7 @@ import { Button, UploadFile, Upload, UploadProps, List } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { UploadSolutionMessage } from "./UploadSolutionMessage";
 import { SERVER_ROOT_URL } from "@/app/Global/url";
-import { HTMLComponent } from "../../problem_components";
+import { HTMLComponent } from "../../../Global/problem_components";
 let fileList_default: UploadFile[] = []
 
 if (DEBUG_NO_BACKEND){
