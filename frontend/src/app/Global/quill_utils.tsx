@@ -9,6 +9,7 @@ const quill_modules = {
       ["formula"]
     ],
     handlers: {},
+    formula: true
     }
   }
 

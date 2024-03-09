@@ -4,12 +4,14 @@ import 'katex/dist/katex.css';
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import { quill_modules } from "@/app/Global/quill_utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, UploadFile, Upload, UploadProps, List } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
 import { UploadSolutionMessage } from "./UploadSolutionMessage";
 import { SERVER_ROOT_URL } from "@/app/Global/url";
 import { HTMLComponent } from "../../../Global/problem_components";
+import { problemQueryIDFetch } from "@/components/problems/fetch_function/problemQueryID";
+import { Result } from "postcss";
 let fileList_default: UploadFile[] = []
 
 if (DEBUG_NO_BACKEND){
@@ -38,9 +40,13 @@ if (DEBUG_NO_BACKEND){
 
 const defaultSolutionText = ''
 export default function Page({ params }: { params: { problemID: string } }) {
+  
   const problemID = params.problemID
   const [fileList, setFileList] = useState<UploadFile[]>(fileList_default);
   const [solutionText, setSolutionText] = useState<string>(defaultSolutionText)
+  const [problemText, setProblemText] = useState<string>('');
+  const [has_images, setHasImages] = useState<boolean>(false)
+  const [images, setImages] = useState<JSX.Element[]>([])
 
   const handleSolutionTextChange = (value: string) => {
     setSolutionText(value)
@@ -75,44 +81,18 @@ export default function Page({ params }: { params: { problemID: string } }) {
     }).catch((e) => console.log(e))
   }
 
-  // get problem content
-  let problemText = '<p>test<p>'
-  let has_images = false
-  let images : JSX.Element[]= []
-  if (DEBUG_NO_BACKEND){
-    problemText = '<p>test with problem ID = ' +  problemID +'<p>'
-    has_images = true
-    images = [<img
-      width={200}
-      alt="logo"
-      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-      />,
-      <img
-      width={100}
-      alt="logo"
-      src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-    />,
-  ]
-  } else {
-    fetch(SERVER_ROOT_URL + 'problemQueryID',{
-      method: "POST", 
-      headers: {"Content-Type":"text/plain"},
-      body: JSON.stringify(new UploadSolutionMessage(
-        problemID, solutionText, fileList
-      ))
-    }).then(response => response.json()).then(replyJson => {
-      console.log(replyJson)
-      if (replyJson.status === 200) {
-        problemText = replyJson.problemContent
-        if (replyJson.images.length > 0){
-          has_images = true
-          images = replyJson.images.map((imagePath: string) => (<img width={272} src={imagePath}/>))
-        }
-      } else {
-          alert(replyJson.message) //以后改一个状态条，优雅一点
-      }
-    }).catch((e) => console.log(e))
+  
+
+  useEffect(() => {
+      fetchData();
+    }, []);
+  const fetchData = () => {
+    const result = problemQueryIDFetch({problemID})
+    setProblemText(result.problemText)
+    setHasImages(result.has_images)
+    setImages(result.images)
   }
+  
     return <>
     <h1>上传题解</h1>
     <h2>题目ID</h2> 
