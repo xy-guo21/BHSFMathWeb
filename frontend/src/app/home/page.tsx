@@ -13,6 +13,7 @@ const Home: React.FC = () => {
     <Button onClick={()=>{handleClick('/user')}}>User Home Page</Button>
     <Button onClick={()=>{handleClick('/problem')}}>Problem Set</Button>
     <Button onClick={()=>{handleClick('/discussion')}}>Discussion</Button>
+    <Button onClick={()=>{handleClick('/paper')}}>Paper Set</Button>
   </>
 }
 export default Home;

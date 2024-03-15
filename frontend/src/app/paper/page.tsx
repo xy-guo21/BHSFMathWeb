@@ -30,6 +30,7 @@ const PaperListPage: React.FC = ()=>{
     }
 
     return <>
+        <Button onClick={()=>{router.push('/home')}}>返回主页</Button>
         <h1>所有试卷</h1>
         <List
             itemLayout="vertical"
