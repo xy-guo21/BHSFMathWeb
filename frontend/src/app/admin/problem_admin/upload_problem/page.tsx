@@ -1,6 +1,6 @@
 'use client'
 
-import UploadProblemPage from "@/components/problems/upload_page"
+import UploadProblemPage from "../../../../../public/components/problem/upload_page"
 
 const App = ()=>{
     return <>

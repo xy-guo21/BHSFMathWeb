@@ -124,7 +124,7 @@ const ProblemSearch: React.FC = () => {
               <Select
                 showSearch
                 style={{ width: '100%', marginBottom: '1rem' }}
-                placeholder="请选择类别"
+                placeholder="请选择类别（label）"
                 optionFilterProp="children"
                 onChange={(value) => setSelectedTopic(value)}
               >

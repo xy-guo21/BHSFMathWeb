@@ -1,5 +1,6 @@
 'use client'
-import { DisplayProblemItem, ProblemItem } from "../../Global/ProblemItem";
+import { ProblemItem } from "../../../../public/components/problem/ProblemItem";
+import { DisplayProblemItem } from "../../../../public/components/problem/DisplayProblemItem";
 import { List, Button, Checkbox, Input } from "antd";
 import { UploadProblemMessage } from "../upload_problem/UploadProblemMessage";
 import { useRouter } from "next/navigation";
@@ -9,7 +10,7 @@ import { SERVER_ROOT_URL } from "@/app/Global/url";
 import { RemoveFromProblemBoxMessage } from "./RemoveFromProblemBoxMessage";
 import { useState } from "react";
 import { useEffect } from "react";
-import { problemIDs_debug } from "../../Global/ProblemItem";
+import { problemIDs_debug } from "../../../../public/components/problem/ProblemItem";
 import { CheckboxProps } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import {Form, 

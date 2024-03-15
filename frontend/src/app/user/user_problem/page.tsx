@@ -9,9 +9,10 @@ import { useRouter } from 'next/navigation';
 import { HTMLComponent } from '../../Global/problem_components';
 import { DEBUG_NO_BACKEND } from '@/app/Global/self_setting';
 import { SERVER_ROOT_URL } from '@/app/Global/url';
-import { DisplayProblemItem, ProblemItem } from '../../Global/ProblemItem';
+import { ProblemItem } from '../../../../public/components/problem/ProblemItem';
+import { DisplayProblemItem } from '../../../../public/components/problem/DisplayProblemItem';
 import { useEffect } from 'react';
-import { problemIDs_debug } from '../../Global/ProblemItem';
+import { problemIDs_debug } from '../../../../public/components/problem/ProblemItem';
 
 let problemIDs_default: string[] = []
 

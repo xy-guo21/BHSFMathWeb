@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect } from 'react';
-import { DisplayProblemItem, ProblemItem } from '../../Global/ProblemItem';
+import { DisplayProblemItem } from '../../../../public/components/problem/DisplayProblemItem';
+
 import { DEBUG_NO_BACKEND} from '@/app/Global/self_setting';
 import { List, Space, Button } from 'antd';
 import { LikeOutlined, MessageOutlined, StarOutlined, DislikeOutlined, KeyOutlined } from '@ant-design/icons';
@@ -10,7 +11,7 @@ import { SERVER_ROOT_URL } from '@/app/Global/url';
 import { ProblemQueryIDMessage } from '@/app/problem/ProblemQueryMessage';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { problemIDs_debug } from '../../Global/ProblemItem';
+import { problemIDs_debug } from '../../../../public/components/problem/ProblemItem';
 
 let problemIDs_default: string[] = []
 

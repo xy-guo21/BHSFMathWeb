@@ -10,8 +10,9 @@ import { UploadOutlined } from '@ant-design/icons';
 import { UploadSolutionMessage } from "./UploadSolutionMessage";
 import { SERVER_ROOT_URL } from "@/app/Global/url";
 import { HTMLComponent } from "../../../Global/problem_components";
-import { problemQueryIDFetch } from "@/components/problems/fetch_function/problemQueryID";
+import { problemQueryIDFetch, undefined_problem } from "../../../../../public/components/problem/fetch_function/problemQueryID";
 import { Result } from "postcss";
+import { ProblemItem } from "../../../../../public/components/problem/ProblemItem";
 let fileList_default: UploadFile[] = []
 
 if (DEBUG_NO_BACKEND){
@@ -44,9 +45,7 @@ export default function Page({ params }: { params: { problemID: string } }) {
   const problemID = params.problemID
   const [fileList, setFileList] = useState<UploadFile[]>(fileList_default);
   const [solutionText, setSolutionText] = useState<string>(defaultSolutionText)
-  const [problemText, setProblemText] = useState<string>('');
-  const [has_images, setHasImages] = useState<boolean>(false)
-  const [images, setImages] = useState<JSX.Element[]>([])
+  const [problem, setProblem] = useState<ProblemItem>(undefined_problem);
 
   const handleSolutionTextChange = (value: string) => {
     setSolutionText(value)
@@ -87,10 +86,8 @@ export default function Page({ params }: { params: { problemID: string } }) {
       fetchData();
     }, []);
   const fetchData = () => {
-    const result = problemQueryIDFetch({problemID})
-    setProblemText(result.problemText)
-    setHasImages(result.has_images)
-    setImages(result.images)
+    const problem: ProblemItem = problemQueryIDFetch({problemID})
+    setProblem(problem)
   }
   
     return <>
@@ -98,8 +95,8 @@ export default function Page({ params }: { params: { problemID: string } }) {
     <h2>题目ID</h2> 
     {problemID}
     <h2>题目内容</h2>
-    <HTMLComponent htmlString={problemText}></HTMLComponent>
-    {has_images && <List dataSource={images} renderItem={(item)=>item}></List>}
+    {problem && <HTMLComponent htmlString={problem.content}></HTMLComponent>}
+    {problem.has_image && <List dataSource={problem.images} renderItem={(item)=>item}></List>}
     <h2>输入题解</h2>
     <p>说明：公式仅支持 Latex 输入</p>
     <p>维护说明：1.加一下暂存</p>
