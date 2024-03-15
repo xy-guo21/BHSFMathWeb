@@ -23,6 +23,7 @@ import {Form,
 import { json } from "stream/consumers";
 import { ConstructPaperMessage } from "./ConstructPaperMessage";
 import { allowedNodeEnvironmentFlags } from "process";
+import { problemBaseOptions } from "@/app/Global/problem_related";
 // let problemIDs_debug = ['0', '1']
 
 const { RangePicker } = DatePicker;
@@ -38,13 +39,17 @@ const formItemLayout = {
     },
   };
 let problemIDs_default: string[] = []
-
+const init_paper_title = ''
+const init_problem_base = ''
+const init_paper_description = ''
 const ProblemBoxPage: React.FC = () => {
     const router = useRouter()
     const [problemIDs, setProblemIDs] = useState<string[]>(problemIDs_default)
     const [selectedProblemIDs, setSelectedProblemIDs] = useState<string[]>([])
-    const [paperTitle, setPaperTitle] = useState<string>()
-    const [paperDescription, setPaperDesciption] = useState<string>('')
+    const [paperTitle, setPaperTitle] = useState<string>(init_paper_title)
+    const [paperDescription, setPaperDesciption] = useState<string>(init_paper_description)
+    const [problemBase, setProblemBase] = useState<string>(init_problem_base)
+
     useEffect(() => {
         fetchData();
       }, []);
@@ -102,6 +107,7 @@ const ProblemBoxPage: React.FC = () => {
     };
 
     const paperTextOnFinish = (values: any) => {
+        setProblemBase(values.problemBase)
         setPaperTitle(values.title)
         setPaperDesciption(values.description)
     }
@@ -112,17 +118,26 @@ const ProblemBoxPage: React.FC = () => {
             alert("请输入试卷标题！")
             return
         }
+        if (problemBase === init_problem_base){
+            alert("请选择试卷所属题库")
+        }
         if (DEBUG_NO_BACKEND){
             alert("组卷成功")
+            setPaperTitle(init_paper_title)
+            setPaperDesciption(init_paper_description)
+            setProblemBase(init_problem_base)
             return
         }
         fetch(SERVER_ROOT_URL + '', {
             method: "POST",
             headers: {"Content-Type": "text/plain"},
-            body: JSON.stringify(new ConstructPaperMessage(selectedProblemIDs, paperTitle, paperDescription))
+            body: JSON.stringify(new ConstructPaperMessage(selectedProblemIDs, paperTitle, paperDescription, problemBase))
         }).then(Response=>Response.json()).then(replyJson =>{
             if (replyJson.status === 200){
                 alert("组卷成功")
+                setPaperTitle(init_paper_title)
+                setPaperDesciption(init_paper_description)
+                setProblemBase(init_problem_base)
             } else {
                 alert(replyJson.message)
             }
@@ -153,6 +168,14 @@ const ProblemBoxPage: React.FC = () => {
         <Form {...formItemLayout} onFinish={paperTextOnFinish} variant="filled" style={{ maxWidth: 600 }}>
             <Form.Item name="title" label="试卷名称" rules={[{ required: true, message: '请输入试卷名称' }]}>
                 <Input />
+            </Form.Item>
+            <Form.Item name="problemBase" label="试卷所属题库" rules={[{ required: true, message: '请输入试卷所属题库' }]}>
+            <Select 
+                value={problemBase}
+                style={{ width: 120 }}
+                onChange={(v: string)=>{setProblemBase(v)}}
+                options={problemBaseOptions}
+            />
             </Form.Item>
             <Form.Item
                 name="description"

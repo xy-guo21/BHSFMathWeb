@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { UploadProblemMessage } from '@/app/user/upload_problem/UploadProblemMessage';
 import 'katex/dist/katex.css';
 import 'react-quill/dist/quill.snow.css';
-import { difficultyOptions, sourceOptions } from '@/app/Global/problem_related';
+import { difficultyOptions, problemBaseOptions, sourceOptions } from '@/app/Global/problem_related';
 import KatexSpan from '@/app/Global/problem_components';
 
 let fileList_default: UploadFile[] = []
@@ -42,10 +42,12 @@ if (DEBUG_NO_BACKEND){
 const init_source = ''
 const init_difficulty = -1
 const init_problem_text = ''
+const init_problem_base = ''
 
 const UploadProblemPage: React.FC = () => {
 //   const router = useRouter();
   const [fileList, setFileList] = useState<UploadFile[]>(fileList_default);
+  const [problemBase, setProblemBase] = useState<string>(init_problem_base)
   const [source, setSource] = useState<string>(init_source)
   const [difficulty, setDifficulty] = useState<number>(init_difficulty);
   const [problemText, setProblemText] = useState<string>(init_problem_text);
@@ -65,15 +67,21 @@ const UploadProblemPage: React.FC = () => {
     }
     if (difficulty === init_difficulty){
       alert("请选择难度")
+      return
+    }
+    if (problemBase === init_problem_base){
+      alert("请选择试卷所属题库")
+      return
     }
     console.log(new UploadProblemMessage(
-      source, difficulty, problemText, fileList
+      source, difficulty, problemBase, problemText, fileList
     ))
     if(DEBUG_NO_BACKEND){
       alert("上传题目成功！")
       setSource(init_source)
       setDifficulty(init_difficulty)
       setProblemText(init_problem_text)
+      setProblemBase(init_problem_base)
       setFileList(fileList_default)
       return
     }
@@ -81,7 +89,7 @@ const UploadProblemPage: React.FC = () => {
       method: "POST", 
       headers: {"Content-Type":"text/plain"},
       body: JSON.stringify(new UploadProblemMessage(
-        source, difficulty, problemText, fileList
+        source, difficulty, problemBase, problemText, fileList
       ))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
@@ -90,6 +98,7 @@ const UploadProblemPage: React.FC = () => {
           setSource(init_source)
           setDifficulty(init_difficulty)
           setProblemText(init_problem_text)
+          setProblemBase(init_problem_base)
           setFileList(fileList_default)
       } else {
           alert(replyJson.message) //以后改一个状态条，优雅一点
@@ -108,6 +117,13 @@ const UploadProblemPage: React.FC = () => {
         style={{ width: 120 }}
         onChange={(v: string)=>{setSource(v)}}
         options={sourceOptions}
+      />
+      <h2>选择题库</h2>
+      <Select 
+        value={problemBase}
+        style={{ width: 120 }}
+        onChange={(v: string)=>{setProblemBase(v)}}
+        options={problemBaseOptions}
       />
       <h2>题目文字</h2>
       <p>说明：公式仅支持 Latex 输入</p>

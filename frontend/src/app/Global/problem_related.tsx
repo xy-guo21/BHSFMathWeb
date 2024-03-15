@@ -8,4 +8,8 @@ const difficultyOptions = [
     {value: 0, label: "简单"},
     {value: 1, label: "中等"}
 ]
-export {sourceOptions, difficultyOptions}
+const problemBaseOptions = [
+    {value: "初中数学", label: "初中数学"},
+    {value: "高中数学", label: "高中数学"}
+]
+export {sourceOptions, difficultyOptions, problemBaseOptions}
