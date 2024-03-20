@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { paperQueryIDFetch } from "../../../../public/components/paper/fetch_function/queryPaperID"
 import { PaperItem, undefined_paper } from "../../../../public/components/paper/PaperItem"
 import { Divider, Typography, List, Button } from 'antd';
-import { DisplayProblemItem } from "../../../../public/components/problem/DisplayProblemItem";
+import { DisplayProblemListItem } from "../../../../public/components/problem/DisplayProblemItem";
 import { useRouter } from "next/navigation";
 const { Title, Paragraph, Text, Link } = Typography;
 
@@ -39,7 +39,7 @@ const PaperDetailPage = ({ params }: { params: { paper_id: string , data: string
             }}
             dataSource={problemIDs}
             renderItem={(problemID) => (
-            <DisplayProblemItem problemID={problemID} opt={
+            <DisplayProblemListItem problemID={problemID} opt={
             <></>
             }/>
             )}

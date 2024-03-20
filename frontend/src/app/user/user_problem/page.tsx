@@ -10,7 +10,7 @@ import { HTMLComponent } from '../../Global/problem_components';
 import { DEBUG_NO_BACKEND } from '@/app/Global/self_setting';
 import { SERVER_ROOT_URL } from '@/app/Global/url';
 import { ProblemItem } from '../../../../public/components/problem/ProblemItem';
-import { DisplayProblemItem } from '../../../../public/components/problem/DisplayProblemItem';
+import { DisplayProblemListItem } from '../../../../public/components/problem/DisplayProblemItem';
 import { useEffect } from 'react';
 import { problemIDs_debug } from '../../../../public/components/problem/ProblemItem';
 
@@ -48,7 +48,7 @@ const App: React.FC = () => {
             }}
             dataSource={problemIDs}
             renderItem={(problemID) => (
-            <DisplayProblemItem problemID={problemID} opt={
+            <DisplayProblemListItem problemID={problemID} opt={
             <>
                 <Button onClick={()=>{router.push('/user/upload_answer/' + problemID)}}>上传题解</Button>
                 <Button onClick={()=>{router.push('/user/edit_problem/' + problemID)}}>编辑题目</Button>

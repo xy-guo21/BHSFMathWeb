@@ -12,12 +12,11 @@ import { UploadProblemMessage } from '@/app/user/upload_problem/UploadProblemMes
 import 'katex/dist/katex.css';
 import 'react-quill/dist/quill.snow.css';
 import { difficultyOptions, problemBaseOptions, sourceOptions } from '@/app/Global/problem_related';
-import KatexSpan from '@/app/Global/problem_components';
+import {KatexSpan} from '@/app/Global/problem_components';
+import { EditProblemMessage } from '@/app/user/edit_problem/[problemID]/EditProblemMessage';
 
-let fileList_default: UploadFile[] = []
 const {TextArea} = Input
-if (DEBUG_NO_BACKEND){
-    fileList_default = [
+const fileList_debug = [
         {
           uid: '0',
           name: 'xxx.png',
@@ -38,20 +37,22 @@ if (DEBUG_NO_BACKEND){
         },
       ];
 
-}
+const init_fileList: UploadFile[] = []
 const init_source = ''
 const init_difficulty = -1
 const init_problem_text = ''
 const init_problem_base = ''
 
-const UploadProblemPage: React.FC = () => {
-//   const router = useRouter();
-  const [fileList, setFileList] = useState<UploadFile[]>(fileList_default);
-  const [problemBase, setProblemBase] = useState<string>(init_problem_base)
-  const [source, setSource] = useState<string>(init_source)
-  const [difficulty, setDifficulty] = useState<number>(init_difficulty);
-  const [problemText, setProblemText] = useState<string>(init_problem_text);
 
+const UploadProblemForm = (params: {
+  difficulty: number, source: string, problemBase: string, 
+  problemText: string, fileList?: UploadFile[], problemID?: string, 
+  refreshPage?: ()=>void})=>{
+  const [fileList, setFileList] = useState<UploadFile[]>(params.fileList? params.fileList: []);
+  const [problemBase, setProblemBase] = useState<string>(params.problemBase)
+  const [source, setSource] = useState<string>(params.source)
+  const [difficulty, setDifficulty] = useState<number>(params.difficulty);
+  const [problemText, setProblemText] = useState<string>(params.problemText);
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
     setFileList(newFileList);
 
@@ -60,6 +61,13 @@ const UploadProblemPage: React.FC = () => {
     console.log(value)
   }
   // <QuillInput onChangeFunc={handleProblemTextChange}/>
+  const resetInput = () =>{
+    setSource(init_source)
+    setDifficulty(init_difficulty)
+    setProblemText(init_problem_text)
+    setProblemBase(init_problem_base)
+    setFileList(init_fileList)
+  }
   const handleUpload = () => {
     if (source === init_source){
       alert("请选择题源")
@@ -73,47 +81,60 @@ const UploadProblemPage: React.FC = () => {
       alert("请选择试卷所属题库")
       return
     }
-    console.log(new UploadProblemMessage(
-      source, difficulty, problemBase, problemText, fileList
-    ))
-    if(DEBUG_NO_BACKEND){
-      alert("上传题目成功！")
-      setSource(init_source)
-      setDifficulty(init_difficulty)
-      setProblemText(init_problem_text)
-      setProblemBase(init_problem_base)
-      setFileList(fileList_default)
-      return
-    }
-    fetch(SERVER_ROOT_URL + 'uploadProblem',{
-      method: "POST", 
-      headers: {"Content-Type":"text/plain"},
-      body: JSON.stringify(new UploadProblemMessage(
+    if (params.problemID === undefined){
+      console.log(new UploadProblemMessage(
         source, difficulty, problemBase, problemText, fileList
       ))
-    }).then(response => response.json()).then(replyJson => {
-      console.log(replyJson)
-      if (replyJson.status === 200) {
-          alert("上传题目成功！")
-          setSource(init_source)
-          setDifficulty(init_difficulty)
-          setProblemText(init_problem_text)
-          setProblemBase(init_problem_base)
-          setFileList(fileList_default)
-      } else {
-          alert(replyJson.message) //以后改一个状态条，优雅一点
+      if(DEBUG_NO_BACKEND){
+        alert("上传题目成功！")
+        resetInput()
+        return
       }
-    }).catch((e) => console.log(e))
+      fetch(SERVER_ROOT_URL + 'uploadProblem',{
+        method: "POST", 
+        headers: {"Content-Type":"text/plain"},
+        body: JSON.stringify(new UploadProblemMessage(
+          source, difficulty, problemBase, problemText, fileList
+        ))
+      }).then(response => response.json()).then(replyJson => {
+        console.log(replyJson)
+        if (replyJson.status === 200) {
+            alert("上传题目成功！")
+            resetInput()
+        } else {
+            alert(replyJson.message) //以后改一个状态条，优雅一点
+        }
+      }).catch((e) => console.log(e))
+    } else {
+      if (DEBUG_NO_BACKEND){
+        alert("修改题目成功！")
+        params.refreshPage? params.refreshPage() : {}
+        return
+      }
+      fetch(SERVER_ROOT_URL + 'editProblem',{
+        method: "POST", 
+        headers: {"Content-Type":"text/plain"},
+        body: JSON.stringify(new EditProblemMessage(
+          params.problemID, source, difficulty, problemBase, problemText, fileList
+        ))
+      }).then(response => response.json()).then(replyJson => {
+        console.log(replyJson)
+        if (replyJson.status === 200) {
+            alert("修改题目成功！")
+            resetInput()
+        } else {
+            alert(replyJson.message) //以后改一个状态条，优雅一点
+        }
+      }).catch((e) => console.log(e))
+    }
   }
-  return (
-    <div>
-      <h1>上传题目</h1>
-      <h2>选择难度</h2>
-      <Radio.Group value={difficulty} buttonStyle="solid" options={difficultyOptions} onChange={(e)=>{setDifficulty(e.target.value)}}>
+  return <>
+    <h2>选择难度</h2>
+      <Radio.Group value={params.difficulty} buttonStyle="solid" options={difficultyOptions} onChange={(e)=>{setDifficulty(e.target.value)}}>
       </Radio.Group>
       <h2>选择题源</h2>
       <Select
-        value={source}
+        value={params.source}
         style={{ width: 120 }}
         onChange={(v: string)=>{setSource(v)}}
         options={sourceOptions}
@@ -141,11 +162,27 @@ const UploadProblemPage: React.FC = () => {
       defaultFileList={[...fileList]}
       onChange={handleChange}
       >
-        <Button icon={<UploadOutlined />}>Upload</Button>
+        <Button icon={<UploadOutlined />}>上传图片</Button>
       </Upload>
-      <Button onClick={handleUpload}> 确认上传题目 </Button>
+      {params.problemID ? <Button onClick={handleUpload}> 确认修改题目 </Button>: <Button onClick={handleUpload}> 确认上传题目 </Button>}
+    </>
+}
+const UploadProblemPage: React.FC = () => {
+//   const router = useRouter()
+  return (
+    <div>
+      <h1>上传题目</h1>
+      <UploadProblemForm 
+        difficulty={init_difficulty}
+        source={init_source}
+        problemBase={init_problem_base}
+        problemText={init_problem_text}
+      />
     </div>
   );
 };
 
+
 export default UploadProblemPage;
+
+export {UploadProblemForm, init_difficulty, init_problem_base, init_problem_text, init_source, fileList_debug}

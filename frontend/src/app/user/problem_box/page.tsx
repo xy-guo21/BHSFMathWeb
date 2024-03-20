@@ -1,6 +1,6 @@
 'use client'
 import { ProblemItem } from "../../../../public/components/problem/ProblemItem";
-import { DisplayProblemItem } from "../../../../public/components/problem/DisplayProblemItem";
+import { DisplayProblemListItem } from "../../../../public/components/problem/DisplayProblemItem";
 import { List, Button, Checkbox, Input } from "antd";
 import { UploadProblemMessage } from "../upload_problem/UploadProblemMessage";
 import { useRouter } from "next/navigation";
@@ -155,7 +155,7 @@ const ProblemBoxPage: React.FC = () => {
             }}
             dataSource={problemIDs}
             renderItem={(problemID) => (
-            <DisplayProblemItem  problemID={problemID} opt={
+            <DisplayProblemListItem  problemID={problemID} opt={
                 <>
                 <Button onClick={()=>{router.push('/problem/' + problemID)}}>查看详情</Button>
                 <Button onClick={()=>removeOnclick(problemID)}>从试题篮中删除</Button>

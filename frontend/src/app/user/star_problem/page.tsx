@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect } from 'react';
-import { DisplayProblemItem } from '../../../../public/components/problem/DisplayProblemItem';
+import { DisplayProblemListItem } from '../../../../public/components/problem/DisplayProblemItem';
 
 import { DEBUG_NO_BACKEND} from '@/app/Global/self_setting';
 import { List, Space, Button } from 'antd';
@@ -47,7 +47,7 @@ const StarProblemPage: React.FC = () =>{
             }}
             dataSource={problemIDs}
             renderItem={(problemID) => (
-            <DisplayProblemItem problemID={problemID} opt={
+            <DisplayProblemListItem problemID={problemID} opt={
             <>
                 <Button onClick={()=>{router.push('/problem/' + problemID)}}>查看详情</Button>
                 <Button onClick={()=>{alert("这里的功能还没开放，以后再来探索吧！")}}>取消收藏</Button>

@@ -57,8 +57,8 @@ import renderMathInElement from 'katex/dist/contrib/auto-render';
 import 'katex/dist/katex.min.css';
 import { useEffect, useRef } from 'react';
 
-const text = "aaa$\\frac{a}{b}\\epsilon$"
-export default function KatexSpan({ ...delegated }) {
+// const text = "aaa$\\frac{a}{b}\\epsilon$"
+const KatexSpan = ({ text = '$a_1$', ...delegated }) => {
   const katexTextRef = useRef();
   useEffect(() => {
     if (katexTextRef.current) {
@@ -77,4 +77,6 @@ export default function KatexSpan({ ...delegated }) {
     </div>
   );
 }
+
+export {KatexSpan}
 
