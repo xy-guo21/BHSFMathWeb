@@ -8,6 +8,7 @@ def request_failed(info, status_code=400):
 
 def request_success(data={}, need_cookie=False, delete_cookie=False, id=None, password=None):
     resp = JsonResponse({
+        "status" : 200,
         "code": 0,
         "message": "Succeed",
         **data
