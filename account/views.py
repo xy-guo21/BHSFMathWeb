@@ -89,7 +89,7 @@ def adminLogin(req: HttpRequest):
             password = body.get("password")
 
             # check if the adminID and password are correct
-            user = auth.authenticate(adminID=adminID, password=password)
+            user = User.objects.filter(username='admin'+str(adminID), password=password).first()
             if user:
                 auth.login(req, user)
             
