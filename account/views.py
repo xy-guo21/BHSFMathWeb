@@ -39,8 +39,10 @@ def login(req: HttpRequest):
 
             # check if the studentID and password are correct
             user = User.objects.filter(username='stu'+str(studentID), password=password).first()
-            if user:
-                auth.login(req, user)
+            assert user, "StudentID or password is incorrect"
+            
+            auth.login(req, user)
+            
             return request_success()
         except Exception as e:
             return request_failed(str(e))
