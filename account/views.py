@@ -68,7 +68,6 @@ def register(req: HttpRequest):
             # create a new student
             student = User.create_student(
                 studentID=studentID,
-                userName=userName,
                 password=password,
                 schoolName=schoolName,
                 enrollmentYear=enrollmentYear,
