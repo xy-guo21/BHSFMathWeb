@@ -1,6 +1,6 @@
 from django.db import models
 from taggit.managers import TaggableManager
-from account.models import Student
+from account.models import User
 
 # Create your models here.
 class Problem(models.Model):
@@ -8,14 +8,14 @@ class Problem(models.Model):
     content = models.TextField(blank=True, null=True)
     # answer = models.TextField(blank=True, null=True)
 
-    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE, related_name="createdProblem", blank=True, null=True)
+    creator = models.ForeignKey(to='account.User', on_delete=models.CASCADE, related_name="createdProblem", blank=True, null=True)
     createTime = models.DateTimeField(auto_now_add=True)
 
     topics = TaggableManager(blank=True)
     source = models.TextField(blank=True, null=True)
 
     difficulty = models.IntegerField(blank=True, null=True)
-    stars = models.ManyToManyField(to='account.Student', related_name="starredProblem", blank=True)
+    stars = models.ManyToManyField(to='account.User', related_name="starredProblem", blank=True)
 
     image = models.ImageField(upload_to="problemImages", blank=True, null=True)
     # answerImage = models.ImageField(upload_to="problemImages", blank=True, null=True)
@@ -41,7 +41,7 @@ class Problem(models.Model):
 
         return ret
     
-    def star(self, student: Student):
+    def star(self, student: User):
         if student in self.stars.all():
             self.stars.remove(student)
         else:
@@ -52,7 +52,7 @@ class Solution(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='solutions')
     content = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="solutionImages", blank=True, null=True)
-    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE, related_name="createdSolution", blank=True, null=True)
+    creator = models.ForeignKey(to='account.User', on_delete=models.CASCADE, related_name="createdSolution", blank=True, null=True)
     createTime = models.DateTimeField(auto_now_add=True)
 
     def serialize(self):
@@ -70,12 +70,12 @@ class Comment(models.Model):
     problem = models.ForeignKey(to=Problem, on_delete=models.CASCADE)
     content = models.TextField()
     image = models.ImageField(upload_to="commentImages", blank=True, null=True)
-    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    creator = models.ForeignKey(to='account.User', on_delete=models.CASCADE)
     createTime = models.DateTimeField(auto_now_add=True)
     commentTo = models.ForeignKey(to='self', on_delete=models.CASCADE, blank=True, null=True)
 
-    likes = models.ManyToManyField(to='account.Student', related_name="likedComment", blank=True)
-    dislikes = models.ManyToManyField(to='account.Student', related_name="dislikedComment", blank=True)
+    likes = models.ManyToManyField(to='account.User', related_name="likedComment", blank=True)
+    dislikes = models.ManyToManyField(to='account.User', related_name="dislikedComment", blank=True)
 
     def serialize(self):
         return {
@@ -90,16 +90,16 @@ class Comment(models.Model):
             "dislikes": self.dislikes.count(),
         }
     
-    def like(self, student: Student):
+    def like(self, student: User):
         self.likes.add(student)
         self.dislikes.remove(student)
 
-    def dislike(self, student: Student):
+    def dislike(self, student: User):
         self.dislikes.add(student)
         self.likes.remove(student)
 
 class Scoring(models.Model):
-    student = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    student = models.ForeignKey(to='account.User', on_delete=models.CASCADE)
     problem = models.ForeignKey(to=Problem, on_delete=models.CASCADE)
     score = models.IntegerField()
 
@@ -108,7 +108,7 @@ class Scoring(models.Model):
         self.save()
 
 class ProblemBox(models.Model):
-    student = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    student = models.ForeignKey(to='account.User', on_delete=models.CASCADE)
     problems = models.ManyToManyField(to=Problem, related_name="problemBox", blank=True)
 
     def serialize(self):
@@ -135,14 +135,14 @@ class ProblemBox(models.Model):
 class Paper(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    creator = models.ForeignKey(to='account.Student', on_delete=models.CASCADE)
+    creator = models.ForeignKey(to='account.User', on_delete=models.CASCADE)
     createTime = models.DateTimeField(auto_now_add=True)
 
     problems = models.ManyToManyField(to=Problem, related_name="papers", blank=True)
 
-    likes = models.ManyToManyField(to='account.Student', related_name="likedPaper", blank=True)
-    dislikes = models.ManyToManyField(to='account.Student', related_name="dislikedPaper", blank=True)
-    stars = models.ManyToManyField(to='account.Student', related_name="starredPaper", blank=True)
+    likes = models.ManyToManyField(to='account.User', related_name="likedPaper", blank=True)
+    dislikes = models.ManyToManyField(to='account.User', related_name="dislikedPaper", blank=True)
+    stars = models.ManyToManyField(to='account.User', related_name="starredPaper", blank=True)
 
     def serialize(self):
         return {
@@ -154,15 +154,15 @@ class Paper(models.Model):
             "problemIDs": [problem.id for problem in self.problems.all()],
         }
     
-    def like(self, student: Student):
+    def like(self, student: User):
         self.likes.add(student)
         self.dislikes.remove(student)
     
-    def dislike(self, student: Student):
+    def dislike(self, student: User):
         self.dislikes.add(student)
         self.likes.remove(student)
 
-    def star(self, student: Student):
+    def star(self, student: User):
         if student in self.stars.all():
             self.stars.remove(student)
         else:

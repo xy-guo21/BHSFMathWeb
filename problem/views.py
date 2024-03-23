@@ -1,12 +1,13 @@
 import json
 from django.http import HttpRequest
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 from utils.utils_request import BAD_METHOD, request_failed, request_success, return_field
 from utils.utils_require import CheckRequire, require
 from utils.utils_time import get_timestamp
 
-from account.models import Student, Admin
+from account.models import User
 from problem.models import Problem, Solution, Comment, Scoring, ProblemBox, Paper
 
 
@@ -79,13 +80,13 @@ def problemQueryDetail(req: HttpRequest):
     
     else:
         return BAD_METHOD
-    
+
 def uploadProblem(req: HttpRequest):
     # upload a problem
     if req.method == "POST":
         try:
             studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
+            student = User.objects.filter(studentID=studentID).first()
             assert student, "Not logged in."
             
             body = json.loads(req.body.decode("utf-8"))
@@ -182,10 +183,9 @@ def querySolutionDetail(req: HttpRequest):
 def uploadSolution(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             assert problemID, "Problem ID is required."
@@ -239,10 +239,9 @@ def uploadSolution(req: HttpRequest):
 def starProblem(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
@@ -262,9 +261,8 @@ def starProblem(req: HttpRequest):
 def scoreProblem(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
@@ -293,9 +291,8 @@ def scoreProblem(req: HttpRequest):
 def deleteProblem(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
@@ -317,9 +314,8 @@ def deleteProblem(req: HttpRequest):
 def queryCreatedProblem(req: HttpRequest):
     if req.method == "GET":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             created_problem_list = student.createdProblem.all()
 
@@ -337,9 +333,8 @@ def queryCreatedProblem(req: HttpRequest):
 def queryStarredProblem(req: HttpRequest):
     if req.method == "GET":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             starred_problem_list = student.starredProblem.all()
 
@@ -362,9 +357,8 @@ def queryStarredProblem(req: HttpRequest):
 def uploadComment(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
@@ -421,9 +415,8 @@ def queryComment(req: HttpRequest):
 def likeComment(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             commentID = body.get("commentID")
@@ -444,9 +437,8 @@ def likeComment(req: HttpRequest):
 def dislikeComment(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             commentID = body.get("commentID")
@@ -467,9 +459,8 @@ def dislikeComment(req: HttpRequest):
 def deleteComment(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Admin.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
 
             body = json.loads(req.body.decode("utf-8"))
             commentID = body.get("commentID")
@@ -496,10 +487,9 @@ def deleteComment(req: HttpRequest):
 def queryProblemBox(req: HttpRequest):
     if req.method == "GET":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             problemBox = ProblemBox.objects.filter(student=student).first()
             if not problemBox:
                 problemBox = ProblemBox(student=student)
@@ -517,15 +507,14 @@ def queryProblemBox(req: HttpRequest):
 def addToProblemBox(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
             assert problem, "Problem not exists"
-
+            
             problemBox = ProblemBox.objects.filter(student=student).first()
             if not problemBox:
                 problemBox = ProblemBox(student=student)
@@ -545,15 +534,14 @@ def addToProblemBox(req: HttpRequest):
 def removeFromProblemBox(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             problemID = body.get("problemID")
             problem = Problem.objects.filter(id=problemID).first()
             assert problem, "Problem not exists"
-
+            
             problemBox = ProblemBox.objects.filter(student=student).first()
             assert problemBox, "Problem box not exists"
 
@@ -576,10 +564,9 @@ def removeFromProblemBox(req: HttpRequest):
 def constructPaper(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             title = body.get("title")
             content = body.get("content")
@@ -620,10 +607,9 @@ def queryPaperList(req: HttpRequest):
 def queryUserPaperList(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             papers = Paper.objects.filter(creator=student)
             return request_success({
                 "paperIDs": [paper.id for paper in papers]
@@ -656,15 +642,14 @@ def queryPaperDetail(req: HttpRequest):
 def likePaper(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             paperID = body.get("paperID")
             paper = Paper.objects.filter(id=paperID).first()
             assert paper, "Paper not exists"
-
+            
             paper.like(student)
 
             return request_success()
@@ -679,10 +664,9 @@ def likePaper(req: HttpRequest):
 def dislikePaper(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             paperID = body.get("paperID")
             paper = Paper.objects.filter(id=paperID).first()
@@ -702,10 +686,9 @@ def dislikePaper(req: HttpRequest):
 def starPaper(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Student.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             paperID = body.get("paperID")
             paper = Paper.objects.filter(id=paperID).first()
@@ -725,14 +708,14 @@ def starPaper(req: HttpRequest):
 def deletePaper(req: HttpRequest):
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = Admin.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in"
-
+            student = req.user
+            assert student.is_authenticated, "Not logged in."
+            
             body = json.loads(req.body.decode("utf-8"))
             paperID = body.get("paperID")
             paper = Paper.objects.filter(id=paperID).first()
             assert paper, "Paper not exists"
+
             assert student == paper.creator, "Not the creator of the paper"
 
             paper.delete()
