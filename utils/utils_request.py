@@ -13,6 +13,9 @@ def request_success(data={}, need_cookie=False, delete_cookie=False, id=None, pa
         "message": "Succeed",
         **data
     })
+    resp.status_code = 200
+    resp['Access-Control-Allow-Origin-Credentials'] = 'true'
+
     if need_cookie:
         resp.set_cookie('id', str(id), max_age=31536000)
         resp.set_cookie('password', password, max_age=31536000)

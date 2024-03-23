@@ -20,6 +20,25 @@ def home(req: HttpRequest):
         return request_success(user.serialize())
     else:
         return request_success()
+    
+def test_register(req: HttpRequest):
+    student = User().create_student(
+        studentID=2018010001,
+        password="123456",
+        schoolName="SJTU",
+        enrollmentYear=2018,
+        studyPeriod="4",
+    )
+    return request_success(student.serialize())
+
+def test_login(req: HttpRequest):
+    user = User.objects.filter(username='stu2018010001', password
+    ="123456").first()
+    if user:
+        auth.login(req, user)
+        return request_success(user.serialize())
+    else:
+        return request_failed("Login failed")
 
 def logout(req: HttpRequest):
     # user logout
