@@ -66,7 +66,7 @@ def register(req: HttpRequest):
             assert not student, "StudentID already exists"
             
             # create a new student
-            student = User.create_student(
+            student = User().create_student(
                 studentID=studentID,
                 password=password,
                 schoolName=schoolName,
