@@ -12,6 +12,7 @@ import {
   HomeOutlined,
   QuestionCircleOutlined, 
   StarOutlined, 
+  DatabaseOutlined, 
   VideoCameraOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -41,6 +42,7 @@ const routingList = [
   '/user/user_problem', 
   '/user/star_problem',
   '/user/problem_box',
+  '/user/user_paper'
 ]
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -65,7 +67,16 @@ const items: MenuItem[] = [
           label: '上传题目'
       }, {
           key: '/user/user_problem',
-          label: '我的题目'
+          label: '已上传题目列表'
+      }]
+    },
+    {
+      key: 'user paper',
+      label: '我的试卷',
+      icon: <DatabaseOutlined />,
+      children: [{
+        key: '/user/user_paper', 
+        label: '已上传试卷列表'
       }]
     },
     {

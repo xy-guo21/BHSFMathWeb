@@ -28,16 +28,6 @@ import { problemBaseOptions } from "@/app/Global/problem_related";
 
 const { RangePicker } = DatePicker;
 
-const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 6 },
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 14 },
-    },
-  };
 let problemIDs_default: string[] = []
 const init_paper_title = ''
 const init_problem_base = ''
@@ -68,6 +58,8 @@ const ProblemBoxPage: React.FC = () => {
                 } else {
                     alert(response.message)
                 }
+            }).catch(e =>{
+                console.log(e)
             })
         }
     }
@@ -164,8 +156,7 @@ const ProblemBoxPage: React.FC = () => {
             }/>
             )}
         />
-        <></>
-        <Form {...formItemLayout} onFinish={paperTextOnFinish} variant="filled" style={{ maxWidth: 600 }}>
+        <Form layout="vertical" onFinish={paperTextOnFinish} variant="filled" style={{ maxWidth: 600 }}>
             <Form.Item name="title" label="试卷名称" rules={[{ required: true, message: '请输入试卷名称' }]}>
                 <Input />
             </Form.Item>

@@ -24,7 +24,7 @@ const RegistrationForm: React.FC = () => {
       alert("添加用户成功")
       return
     }
-    fetch(SERVER_ROOT_URL+'register',{
+    fetch(SERVER_ROOT_URL+'register/',{
       method: "POST", 
       headers:{"Content-Type":"text/plain"},
       body: JSON.stringify(new ResgisterUserMessage(values.username, values.student_id, values.password, values.enrollment, values.school[0], values.school[1]))

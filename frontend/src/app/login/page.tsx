@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Input, Button, Form, Row, Col, Typography } from 'antd';
 import { UserLoginMessage } from './UserLoginMessage';
 import { SERVER_ROOT_URL } from '../Global/url';
-import { setUserToken } from '../Global/TokenStore';
+import { setUserSession } from '../../../public/SessionIDStore';
 import { useRouter } from 'next/navigation';
 import { DEBUG_NO_BACKEND } from '../Global/self_setting';
 
@@ -21,14 +21,14 @@ const LoginForm: React.FC = () => {
       router.push("home")
       return
     }
-    fetch(SERVER_ROOT_URL + "login",{
+    fetch(SERVER_ROOT_URL + "login/",{
       method: "POST", 
       headers: {"Content-Type":"text/plain"},
       body: JSON.stringify(new UserLoginMessage(values.student_id, values.password))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
       if (replyJson.status === 200) {
-          setUserToken(replyJson.message)
+          setUserSession(replyJson.sessionID)
           router.push("/home");
       } else {
           alert(replyJson.message) //以后改一个状态条，优雅一点

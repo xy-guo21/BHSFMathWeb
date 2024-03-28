@@ -5,6 +5,7 @@ import { PaperItem, undefined_paper } from "../../../../public/components/paper/
 import { Divider, Typography, List, Button } from 'antd';
 import { DisplayProblemListItem } from "../../../../public/components/problem/DisplayProblemItem";
 import { useRouter } from "next/navigation";
+import { DisplayPaperItem } from "../../../../public/components/paper/ui";
 const { Title, Paragraph, Text, Link } = Typography;
 
 const PaperDetailPage = ({ params }: { params: { paper_id: string , data: string} })=>{
@@ -22,28 +23,7 @@ const PaperDetailPage = ({ params }: { params: { paper_id: string , data: string
             router.push('/paper')
         }}>返回试卷列表页</Button>
         <Title>试卷详情页</Title>
-        <Paragraph>
-            <ul>
-                <li>试卷ID {paper.paperID}</li>
-                <li>题库 {paper.problemBase}</li>
-                <li>题目IDs {paper.problemIDs}</li>
-            </ul>
-        </Paragraph>
-        <h2>试卷内容</h2>
-        <List
-            itemLayout="vertical"
-            size="large"
-            pagination={{
-                onChange: (page) => {console.log(page);},
-                pageSize: 3,
-            }}
-            dataSource={problemIDs}
-            renderItem={(problemID) => (
-            <DisplayProblemListItem problemID={problemID} opt={
-            <></>
-            }/>
-            )}
-        />
+        <DisplayPaperItem paper_={paper}/>
     </Typography>
 }
 
