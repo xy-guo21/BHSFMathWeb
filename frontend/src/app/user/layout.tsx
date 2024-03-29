@@ -42,7 +42,9 @@ const routingList = [
   '/user/user_problem', 
   '/user/star_problem',
   '/user/problem_box',
-  '/user/user_paper'
+  '/user/user_paper', 
+  '/user/edit_problem', 
+  '/user/edit_paper'
 ]
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -68,6 +70,9 @@ const items: MenuItem[] = [
       }, {
           key: '/user/user_problem',
           label: '已上传题目列表'
+      }, {
+        key: '/user/edit_problem', 
+        label: '编辑题目'
       }]
     },
     {
@@ -77,6 +82,9 @@ const items: MenuItem[] = [
       children: [{
         key: '/user/user_paper', 
         label: '已上传试卷列表'
+      }, {
+        key: '/user/edit_paper', 
+        label: '编辑试卷'
       }]
     },
     {
