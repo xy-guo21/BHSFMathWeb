@@ -41,6 +41,7 @@ const routingList = [
   
   '/admin/problem_admin/upload_problem',
   '/admin/problem_admin/edit_problem', 
+  '/admin/problem_admin/my_problem_list', 
 
   '/admin/problem_admin/problem_box',
   '/admin/system_admin/registration'
