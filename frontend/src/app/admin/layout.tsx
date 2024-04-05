@@ -8,6 +8,8 @@ import {
   TeamOutlined,
   UploadOutlined,
   ShoppingCartOutlined, 
+  IdcardOutlined, 
+  PartitionOutlined, 
   UserOutlined,
   HomeOutlined,
   QuestionCircleOutlined, 
@@ -36,11 +38,54 @@ const { Header, Content, Footer, Sider } = Layout;
 // }));
 const routingList = [
   '/admin/home', 
+  
   '/admin/problem_admin/upload_problem',
+  '/admin/problem_admin/edit_problem', 
+
   '/admin/problem_admin/problem_box',
+  '/admin/system_admin/registration'
 ]
 
 type MenuItem = Required<MenuProps>['items'][number];
+const problemItems: MenuItem[] = [
+  {
+    key: '/admin/problem_admin/upload_problem',
+    label: '上传题目'
+  }, {
+    key: '/admin/problem_admin/edit_problem', 
+    label: '编辑题目'
+  }, {
+    key: '/admin/problem_admin/problem_list', 
+    label: '题目列表页'
+  }, {
+    key: '/admin/problem_admin/my_problem_list', 
+    label: '我上传的题目'
+  }
+]
+const paperItems: MenuItem[] = [
+  {
+    key: '/admin/problem_admin/problem_box',
+    label: '试题篮'
+  }, 
+  {
+    key: '/admin/problem_admin/edit_paper', 
+    label: '编辑试卷'
+  }, 
+  {
+    key: '/admin/problem_admin/paper_list', 
+    label: '试卷列表'
+  }, 
+  {
+    key: '/admin/problem_admin/my_paper', 
+    label: '我上传的试卷'
+  }
+]
+const problemBaseItems: MenuItem[] = [
+  {
+    key: '?',
+    label: '建立题库'
+  }
+]
 const items: MenuItem[] = [
     { 
       key: '/admin/home',
@@ -55,7 +100,7 @@ const items: MenuItem[] = [
     {
       key: 'super admin',
       label: '超级管理员',
-      icon: React.createElement(QuestionCircleOutlined), 
+      icon: <IdcardOutlined />, 
       // type: 'group',
       children: [{
           key: '/admin/super_admin/user_list',
@@ -66,18 +111,35 @@ const items: MenuItem[] = [
       }]
     },
     {
-      key: 'problem admin',
+      key: 'problem base admin',
       label: '题库管理员',
       icon: React.createElement(QuestionCircleOutlined), 
       // type: 'group',
       children: [{
-          key: '/admin/problem_admin/upload_problem',
-          label: '上传题目'
+        key: 'problem', 
+        label: "题目相关", 
+        children: problemItems
       }, {
-          key: '/admin/problem_admin/problem_box',
-          label: '试题篮'
+        key: 'paper', 
+        label: '试卷相关', 
+        children: paperItems
+      }, {
+        key: 'problemBase', 
+        label: '题库相关', 
+        children: problemBaseItems
       }]
     },
+    {
+      key: 'system admin', 
+      label: '系统管理员', 
+      icon: <PartitionOutlined />,
+      children: [
+        {
+          key: '/admin/system_admin/registration', 
+          label: '注册学生用户'
+        }
+      ]
+    }
 ]
 
 
