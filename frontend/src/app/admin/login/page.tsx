@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Input, Button, Form, Row, Col, Typography } from 'antd';
 import { AdminLoginMessage } from './AdminLoginMessage';
 import {create} from 'zustand'
-import { setUserSession } from '../../../../public/SessionIDStore';
+import { setUserSession } from '../../../../public/UserTokenStore';
 import { useRouter } from 'next/navigation';
 import { SERVER_ROOT_URL } from '@/app/Global/url';
 import { DEBUG_NO_BACKEND } from '@/app/Global/self_setting';

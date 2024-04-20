@@ -13,6 +13,8 @@ import { ProblemItem } from '../../../../public/components/problem/ProblemItem';
 import { DisplayProblemListItem } from '../../../../public/components/problem/DisplayProblemItem';
 import { useEffect } from 'react';
 import { problemIDs_debug } from '../../../../public/components/problem/ProblemItem';
+import { QueryUserProblemMessage } from '../../../../public/messages/problems/QueryUserProblemMessage';
+import { UserTokenStore } from '../../../../public/UserTokenStore';
 
 let problemIDs_default: string[] = []
 
@@ -30,8 +32,9 @@ const App: React.FC = () => {
         }
         else{
             fetch(SERVER_ROOT_URL+'queryProblemUser', {
-                method: "GET",
-                headers: {"Content-Type": "text/plain"}
+                method: "POST",
+                headers: {"Content-Type": "text/plain"}, 
+                body: JSON.stringify(new QueryUserProblemMessage(UserTokenStore().userToken))
             }).then(response=>response.json()).then(response =>{
                 setProblemIDs(response.problemIDs)
             })
