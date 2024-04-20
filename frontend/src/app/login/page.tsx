@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Input, Button, Form, Row, Col, Typography } from 'antd';
 import { UserLoginMessage } from './UserLoginMessage';
 import { SERVER_ROOT_URL } from '../Global/url';
-import { setUserSession } from '../../../public/SessionIDStore';
+import { setUserToken } from '../../../public/UserTokenStore';
 import { useRouter } from 'next/navigation';
 import { DEBUG_NO_BACKEND } from '../Global/self_setting';
 
@@ -28,7 +28,7 @@ const LoginForm: React.FC = () => {
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
       if (replyJson.status === 200) {
-          setUserSession(replyJson.sessionID)
+          setUserToken(replyJson.userToken)
           router.push("/home");
       } else {
           alert(replyJson.message) //以后改一个状态条，优雅一点

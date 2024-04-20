@@ -44,6 +44,8 @@ const routingList = [
   '/admin/problem_admin/my_problem_list', 
 
   '/admin/problem_admin/problem_box',
+  '/admin/problem_admin/admin_paper_list',
+
   '/admin/system_admin/registration',
 
   '/admin/super_admin/user_list',
@@ -62,7 +64,7 @@ const problemItems: MenuItem[] = [
     key: '/admin/problem_admin/problem_list', 
     label: '题目列表页'
   }, {
-    key: '/admin/problem_admin/my_problem_list', 
+    key: '/admin/problem_admin/admin_problem_list', 
     label: '我上传的题目'
   }
 ]
@@ -80,7 +82,7 @@ const paperItems: MenuItem[] = [
     label: '试卷列表'
   }, 
   {
-    key: '/admin/problem_admin/my_paper', 
+    key: '/admin/problem_admin/admin_paper_list', 
     label: '我上传的试卷'
   }
 ]
