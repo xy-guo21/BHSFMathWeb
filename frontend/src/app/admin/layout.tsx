@@ -44,7 +44,10 @@ const routingList = [
   '/admin/problem_admin/my_problem_list', 
 
   '/admin/problem_admin/problem_box',
-  '/admin/system_admin/registration'
+  '/admin/system_admin/registration',
+
+  '/admin/super_admin/user_list',
+  '/admin/super_admin/admin_list'
 ]
 
 type MenuItem = Required<MenuProps>['items'][number];

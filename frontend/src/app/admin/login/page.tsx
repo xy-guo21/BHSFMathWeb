@@ -94,3 +94,7 @@ const RegistrationForm: React.FC = () => {
 };
 
 export default RegistrationForm;
+
+function setUserToken(message: any) {
+  throw new Error('Function not implemented.');
+}
