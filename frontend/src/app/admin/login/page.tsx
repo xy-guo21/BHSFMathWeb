@@ -3,8 +3,6 @@ import React from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Input, Button, Form, Row, Col, Typography } from 'antd';
 import { AdminLoginMessage } from './AdminLoginMessage';
-import {create} from 'zustand'
-import { setUserSession } from '../../../../public/UserTokenStore';
 import { useRouter } from 'next/navigation';
 import { SERVER_ROOT_URL } from '@/app/Global/url';
 import { DEBUG_NO_BACKEND } from '@/app/Global/self_setting';
@@ -20,7 +18,7 @@ const RegistrationForm: React.FC = () => {
     console.log('password:', values.password)
     console.log(new AdminLoginMessage(values.admin_id, values.password))
     if (DEBUG_NO_BACKEND){
-      setUserSession("test_usertoken")
+      setUserToken("test_usertoken")
       router.push("/admin/home");
       return
     }

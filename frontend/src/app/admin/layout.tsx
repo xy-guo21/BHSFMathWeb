@@ -45,6 +45,8 @@ const routingList = [
 
   '/admin/problem_admin/problem_box',
   '/admin/problem_admin/admin_paper_list',
+  '/admin/problem_admin/construct_problem_base', 
+  '/admin/problem_admin/edit_problem_in_problem_base',
 
   '/admin/system_admin/registration',
 
@@ -88,8 +90,12 @@ const paperItems: MenuItem[] = [
 ]
 const problemBaseItems: MenuItem[] = [
   {
-    key: '?',
-    label: '建立题库'
+    key: '/admin/problem_admin/construct_problem_base',
+    label: '创建题库'
+  }, 
+  {
+    key: '/admin/problem_admin/edit_problem_in_problem_base', 
+    label: '修改题库中题目'
   }
 ]
 const items: MenuItem[] = [

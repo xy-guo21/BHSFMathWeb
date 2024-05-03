@@ -34,7 +34,7 @@ const App: React.FC = () => {
             fetch(SERVER_ROOT_URL+'queryProblemUser', {
                 method: "POST",
                 headers: {"Content-Type": "text/plain"}, 
-                body: JSON.stringify(new QueryUserProblemMessage(UserTokenStore().userToken))
+                body: JSON.stringify(new QueryUserProblemMessage(UserTokenStore.getState().userToken))
             }).then(response=>response.json()).then(response =>{
                 setProblemIDs(response.problemIDs)
             })
