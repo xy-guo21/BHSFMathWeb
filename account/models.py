@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+import time
+import hashlib
+import os
 # Create your models here.
 # class Student(models.Model):
 #     studentID = models.IntegerField(unique=True)
@@ -83,3 +86,27 @@ class User(AbstractUser):
         )
         student.save()
         return student
+
+class UserTokenStore(models.Model):
+    username = models.CharField(max_length=10)
+    userToken = models.CharField(max_length=100)
+    createTime = models.CharField(max_length=10)
+    
+    def create_userTokenStore(self, username):
+        createTime = time.strftime('%Y%m%d_%H%M%S')
+        h = hashlib.sha256()
+        raw_name = (username + createTime).encode() + os.urandom(16)
+        h.update(raw_name)
+        userToken = h.hexdigest()[-100:]
+        userTokenStore = UserTokenStore(
+            username=username, 
+            userToken=userToken, 
+            createTime=createTime
+        )
+        userTokenStore.save()
+        return userTokenStore
+    
+    def serialize(self):
+        return {
+            "userToken": self.userToken
+        }

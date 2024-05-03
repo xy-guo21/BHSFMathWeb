@@ -8,7 +8,7 @@ from utils.utils_require import CheckRequire, require
 from utils.utils_time import get_timestamp
 
 # from account.models import Student, Admin
-from account.models import User
+from account.models import User, UserTokenStore
 from problem.models import Problem
 
 
@@ -58,11 +58,11 @@ def login(req: HttpRequest):
 
             # check if the studentID and password are correct
             user = User.objects.filter(username='stu'+str(studentID), password=password).first()
-            assert user, "StudentID or password is incorrect"
-            
+            assert user, "学生ID或密码不正确"
+            userTokenStore = UserTokenStore().create_userTokenStore(user.username)
             auth.login(req, user)
             
-            return request_success()
+            return request_success(userTokenStore.serialize())
         except Exception as e:
             return request_failed(str(e))
     
@@ -117,5 +117,21 @@ def adminLogin(req: HttpRequest):
         except Exception as e:
             return request_failed(str(e))
     
+    else:
+        return BAD_METHOD
+    
+def queryUserInfo(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            body = json.loads(req.body.decode("utf-8"))
+            userToken = body.get("userToken")
+            print("userToken =", userToken)
+            userTokenStore = UserTokenStore.objects.filter(userToken=userToken).first()
+            assert userTokenStore, "没有找到登录信息，请重新登录"
+            user = User.objects.filter(username=userTokenStore.username).first()
+            assert userTokenStore, "登录信息有误，请重新登录"
+            return request_success(user.serialize())
+        except Exception as e:
+            return request_failed(str(e))
     else:
         return BAD_METHOD
