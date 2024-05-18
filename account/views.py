@@ -110,10 +110,11 @@ def adminLogin(req: HttpRequest):
 
             # check if the adminID and password are correct
             user = User.objects.filter(username='admin'+str(adminID), password=password).first()
-            if user:
-                auth.login(req, user)
+            assert user, "管理员ID或密码不正确"
+            userTokenStore = UserTokenStore().create_userTokenStore(user.username)
+            auth.login(req, user)
             
-            return request_success()
+            return request_success(userTokenStore.serialize())
         except Exception as e:
             return request_failed(str(e))
     
@@ -129,7 +130,7 @@ def queryUserInfo(req: HttpRequest):
             userTokenStore = UserTokenStore.objects.filter(userToken=userToken).first()
             assert userTokenStore, "没有找到登录信息，请重新登录"
             user = User.objects.filter(username=userTokenStore.username).first()
-            assert userTokenStore, "登录信息有误，请重新登录"
+            assert user, "登录信息有误，请重新登录"
             return request_success(user.serialize())
         except Exception as e:
             return request_failed(str(e))

@@ -3,18 +3,19 @@ import { UploadFile } from "antd";
 import { RcFile } from "antd/es/upload";
 
 export class UploadProblemMessage extends TSMSPMessage {
+    userToken: string
     source: string
     difficulty: number
     content: string
-    images: RcFile[]
+    imageIDs: string[]
     problemBase: string
-    constructor(source: string, difficulty: number, problemBase: string, content: string, fileList: UploadFile[]){
+    constructor(userToken: string, source: string, difficulty: number, problemBase: string, content: string, fileList: UploadFile[]){
         super();
+        this.userToken = userToken
         this.source = source
         this.difficulty = difficulty
         this.content = content
-        const images: RcFile[] = fileList.map((ele)=>(ele.originFileObj)).filter((value)=>(value!==undefined))
-        this.images = images
+        this.imageIDs = fileList.map((ele)=>(ele.response.file_id))
         this.problemBase = problemBase
     }
 }

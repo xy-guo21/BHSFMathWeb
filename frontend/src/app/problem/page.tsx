@@ -30,7 +30,7 @@ const ProblemSearch: React.FC = () => {
       setQuestionById(foundQuestion);
       return
     }
-    fetch(SERVER_ROOT_URL + 'problemQueryID', {
+    fetch(SERVER_ROOT_URL + 'problemQueryID/', {
       method: "POST", 
       headers: {"Content-Type":"text/plain"},
       body: JSON.stringify(new ProblemQueryIDMessage(questionId))

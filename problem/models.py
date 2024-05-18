@@ -2,10 +2,18 @@ from django.db import models
 from taggit.managers import TaggableManager
 from account.models import User
 
+class UploadedFile(models.Model):
+    file = models.FileField(upload_to='uploads/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    def is_valid(self):
+        return bool(self.file)
+    
+    
 # Create your models here.
 class Problem(models.Model):
     title = models.CharField(max_length=100, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
+    problemBase = models.TextField(blank=True, null=True)
     # answer = models.TextField(blank=True, null=True)
 
     creator = models.ForeignKey(to='account.User', on_delete=models.CASCADE, related_name="createdProblem", blank=True, null=True)
@@ -16,8 +24,9 @@ class Problem(models.Model):
 
     difficulty = models.IntegerField(blank=True, null=True)
     stars = models.ManyToManyField(to='account.User', related_name="starredProblem", blank=True)
-
-    image = models.ImageField(upload_to="problemImages", blank=True, null=True)
+    
+    images = models.ManyToManyField(UploadedFile)
+    # image = models.ImageField(upload_to="problemImages", blank=True, null=True)
     # answerImage = models.ImageField(upload_to="problemImages", blank=True, null=True)
 
     def serialize(self):
@@ -25,15 +34,18 @@ class Problem(models.Model):
             "problemID": self.id,
             "title": self.title,
             "problemTitle": self.title, # "problemTitle" is a typo, but it's used in the frontend
+            "problemBase": self.problemBase, 
             "userID": self.creator.studentID,
             "createTime": self.createTime,
             "content": self.content,
-            "imagePath": self.image.url if self.image else None,
+            "imagePaths": [img.file.url for img in self.images.all()], 
+            # "imagePath": self.image.url if self.image else None,
             "topics": [topic.name for topic in self.topics.all()],
             "source": self.source,
             "difficulty": self.difficulty,
             "answers": [solution.id for solution in self.solutions.all()],
         }
+        print(ret["imagePaths"])
         # if self.image:
         #     ret["imagePath"] = [self.image.url]
         # if self.answerImage:

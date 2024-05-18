@@ -1,3 +1,3 @@
-const DEBUG_NO_BACKEND = true
+const DEBUG_NO_BACKEND = false
 
 export {DEBUG_NO_BACKEND}

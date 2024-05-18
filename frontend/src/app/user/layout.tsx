@@ -44,7 +44,8 @@ const routingList = [
   '/user/problem_box',
   '/user/user_paper', 
   '/user/edit_problem', 
-  '/user/edit_paper'
+  '/user/edit_paper', 
+  '/user/upload_answer'
 ]
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -73,6 +74,9 @@ const items: MenuItem[] = [
       }, {
         key: '/user/edit_problem', 
         label: '编辑题目'
+      }, {
+        key: '/user/upload_answer',
+        label: '上传题目答案'
       }]
     },
     {

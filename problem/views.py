@@ -7,9 +7,9 @@ from utils.utils_request import BAD_METHOD, request_failed, request_success, ret
 from utils.utils_require import CheckRequire, require
 from utils.utils_time import get_timestamp
 
-from account.models import User
-from problem.models import Problem, Solution, Comment, Scoring, ProblemBox, Paper
-
+from account.models import User, UserTokenStore
+from problem.models import Problem, Solution, Comment, Scoring, ProblemBox, Paper, UploadedFile
+from problem.form import UploadedFileForm
 
 '''
 ====================== Problem & Solution ======================
@@ -32,6 +32,26 @@ def problemQueryID(req: HttpRequest):
         
     else:
         return BAD_METHOD
+    
+
+def problemQueryUser(req: HttpRequest):
+    if req.method != "POST":
+        return BAD_METHOD
+    try:
+        body = json.loads(req.body.decode("utf-8"))
+        userToken = body.get("userToken")
+        userTokenStore = UserTokenStore.objects.filter(userToken=userToken).first()
+        assert userTokenStore, "没有找到登录信息，请重新登录"
+        user = User.objects.filter(username=userTokenStore.username).first()
+        assert user, "登录信息有误，请重新登录"
+        problems = Problem.objects.filter(creator=user)
+        problemIDs = [p.id for p in problems]
+        return request_success({
+                "problemIDs": problemIDs
+            })
+        
+    except Exception as e:
+        return request_failed(str(e))
     
 
 def problemQueryFilter(req: HttpRequest):
@@ -85,37 +105,43 @@ def uploadProblem(req: HttpRequest):
     # upload a problem
     if req.method == "POST":
         try:
-            studentID = req.COOKIES.get("id")
-            student = User.objects.filter(studentID=studentID).first()
-            assert student, "Not logged in."
-            
             body = json.loads(req.body.decode("utf-8"))
+            userToken = body.get("userToken")
+            userTokenStore = UserTokenStore.objects.filter(userToken=userToken).first()
+            assert userTokenStore, "没有找到登录信息，请重新登陆"
+            user = User.objects.filter(username=userTokenStore.username).first()
+            assert user, "登录信息有误，请重新登陆"
             
             # title = body.get("title")
             content = body.get("content")
-            image = req.FILES.get('image')
+            imageIDs = body.get("imageIDs")
             assert content, "Content is required."
 
-            # userID = body.get("userID")
             topics = body.get("topics")
             source = body.get("source")
             difficulty = body.get("difficulty")
+            problemBase = body.get("problemBase")
 
             # create a new problem
             problem = Problem(
                 title = content[:20] if len(content) > 20 else content,
                 content = content,
-                creator = studentID,
+                problemBase = problemBase, 
+                creator = user,
                 source = source,
                 difficulty = difficulty,
-                image = image,
             )
             problem.save()
 
             if topics:
                 problem.topics.add(*topics)
             problem.save()
-
+            
+            if imageIDs:
+                # print("imageIDs =", imageIDs)
+                images = UploadedFile.objects.filter(pk__in=imageIDs)
+                # print([img.id for img in images])
+                problem.images.add(*images)
             # create a new solution if answer or answerImage is provided
             answer = body.get("answer")
             answerImage = req.FILES.get('answerImage')
@@ -125,7 +151,7 @@ def uploadProblem(req: HttpRequest):
                     problem = problem,
                     content = answer,
                     image = answerImage,
-                    creator = student
+                    creator = user
                 )
 
             return request_success()
@@ -727,3 +753,28 @@ def deletePaper(req: HttpRequest):
     
     else:
         return BAD_METHOD
+
+'''
+====================== UploadFile ======================
+'''
+
+def uploadFile(req: HttpRequest):
+    if req.method == "POST":
+        try:
+            form = UploadedFileForm(req.POST, req.FILES)
+            if form.is_valid():
+                # Create a new UploadedFile instance with the uploaded file
+                uploaded_file = form.cleaned_data['file']
+                uploaded_file_instance = UploadedFile(file=uploaded_file)
+                uploaded_file_instance.save()
+                return request_success({
+                    'message': 'File uploaded successfully', 
+                    'file_id': uploaded_file_instance.id, 
+                    'file_path': uploaded_file_instance.file.path})
+            
+        except Exception as e:
+            print(e)
+            return request_failed(str(e))
+    else:
+        return BAD_METHOD
+

@@ -22,13 +22,13 @@ const RegistrationForm: React.FC = () => {
       router.push("/admin/home");
       return
     }
-    fetch(SERVER_ROOT_URL + "admin/login",{
+    fetch(SERVER_ROOT_URL + "adminLogin/",{
       method: "POST", 
       headers: {"Content-Type":"text/plain"},
       body: JSON.stringify(new AdminLoginMessage(values.admin_id, values.password))
     }).then(response => response.json()).then(replyJson => {
       console.log(replyJson)
-      if (replyJson.status === 0) {
+      if (replyJson.status === 200) {
           setUserToken(replyJson.message)
           router.push("/admin/home");
       } else {

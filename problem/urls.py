@@ -3,6 +3,7 @@ import problem.views as views
 
 urlpatterns = [
     # Problem Query
+    path("problemQueryUser/", views.problemQueryUser), 
     path("problemQueryFilter/", views.problemQueryFilter),
     path("problemQueryID/", views.problemQueryID),
     path("problemQueryDetail/", views.problemQueryDetail),
@@ -43,5 +44,7 @@ urlpatterns = [
     path("dislikePaper/", views.dislikePaper, name="dislikePaper"),
     path("starPaper/", views.starPaper, name="starPaper"),
     path("deletePaper/", views.deletePaper, name="deletePaper"),
-
+    
+    # UploadedFile
+    path("uploadFile/", views.uploadFile, name="uploadFile")
 ]

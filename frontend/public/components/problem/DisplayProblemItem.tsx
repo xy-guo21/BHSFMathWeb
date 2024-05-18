@@ -2,7 +2,7 @@
 
 import { List, Space, Button, Flex, Tag, Statistic, Col, Descriptions } from "antd"
 import React, { useEffect, useState } from "react"
-import { LikeOutlined, MessageOutlined, StarOutlined, DislikeOutlined, KeyOutlined } from '@ant-design/icons';
+import { LikeOutlined, MessageOutlined, ContainerOutlined, StarOutlined, DislikeOutlined, KeyOutlined } from '@ant-design/icons';
 import { useRouter } from "next/navigation";
 import { HTMLComponent } from "../../../src/app/Global/problem_components";
 import { ProblemItem, IconText } from "./ProblemItem";
@@ -29,7 +29,14 @@ const DisplayProblemItem = ({problem_}: {problem_: ProblemItem | undefined})=>{
 const DisplayProblemListItem = ({problemID, opt=<></>}: {problemID: string; opt: React.ReactElement}) => {
     const router = useRouter()
     const [problem, setProblem] = useState<ProblemItem>()
-    useEffect(()=>{setProblem(problemQueryIDFetch({problemID}))}, [problemID])
+    useEffect(()=>{
+        const fetchData = async () => {
+            const problem = await problemQueryIDFetch({ problemID });
+            setProblem(problem);
+            console.log("DisplayProblemItem", problem);
+        }
+        fetchData();
+    }, [problemID])
     // const fetchProblem = ()=>{
     //     if(DEBUG_NO_BACKEND){
     //         // console.log(problems_debug[0])
@@ -51,9 +58,10 @@ const DisplayProblemListItem = ({problemID, opt=<></>}: {problemID: string; opt:
                 key={problem.problemID}
                 actions={[
                 <IconText icon={KeyOutlined} text={"id = " + problem.problemID} key="list-vertical-star-o" />,
-                <IconText icon={StarOutlined} text={problem.star.toString()} key="list-vertical-star-o" />,
-                <IconText icon={LikeOutlined} text={problem.star.toString()} key="list-vertical-like-o" />,
-                <IconText icon={DislikeOutlined} text={problem.dislike.toString()} key="list-vertical-star-o" />,
+                // <IconText icon={StarOutlined} text={problem.star.toString()} key="list-vertical-star-o" />,
+                // <IconText icon={LikeOutlined} text={problem.star.toString()} key="list-vertical-like-o" />,
+                // <IconText icon={DislikeOutlined} text={problem.dislike.toString()} key="list-vertical-star-o" />,
+                <IconText icon={ContainerOutlined} text={problem.problemBase} key="problemBase"/>, 
                 <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
                 opt
                 ]}

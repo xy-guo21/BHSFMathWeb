@@ -31,13 +31,17 @@ const App: React.FC = () => {
             setProblemIDs(problemIDs_debug)
         }
         else{
-            fetch(SERVER_ROOT_URL+'queryProblemUser', {
+            fetch(SERVER_ROOT_URL+'problemQueryUser/', {
                 method: "POST",
                 headers: {"Content-Type": "text/plain"}, 
                 body: JSON.stringify(new QueryUserProblemMessage(UserTokenStore.getState().userToken))
             }).then(response=>response.json()).then(response =>{
-                setProblemIDs(response.problemIDs)
-            })
+                if (response.status === 200){
+                    setProblemIDs(response.problemIDs)
+                } else {
+                    alert(response.message)
+                }
+            }).catch((e) => console.log(e))
         }
     }
     return <>

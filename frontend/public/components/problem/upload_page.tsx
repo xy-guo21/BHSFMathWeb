@@ -14,6 +14,7 @@ import 'react-quill/dist/quill.snow.css';
 import { difficultyOptions, problemBaseOptions, sourceOptions } from '@/app/Global/problem_related';
 import {KatexSpan} from '@/app/Global/problem_components';
 import { EditProblemMessage } from '@/app/user/edit_problem/[problemID]/EditProblemMessage';
+import { UserTokenStore } from '../../UserTokenStore';
 
 const {TextArea} = Input
 const fileList_debug = [
@@ -53,9 +54,14 @@ const UploadProblemForm = (params: {
   const [source, setSource] = useState<string>(params.source)
   const [difficulty, setDifficulty] = useState<number>(params.difficulty);
   const [problemText, setProblemText] = useState<string>(params.problemText);
-  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
-    setFileList(newFileList);
 
+  const handleChange: UploadProps['onChange'] = ({file: newFile, fileList: newFileList }) =>{
+    setFileList(newFileList), 
+    () => {
+      console.log("newFileList", newFileList);
+      console.log("id?", newFileList.map((ele)=>(ele.response.file_id)))
+    }
+  }
   const handleProblemTextChange = (value: string) => {
     setProblemText(value)
     console.log(value)
@@ -83,18 +89,18 @@ const UploadProblemForm = (params: {
     }
     if (params.problemID === undefined){
       console.log(new UploadProblemMessage(
-        source, difficulty, problemBase, problemText, fileList
+        UserTokenStore.getState().userToken, source, difficulty, problemBase, problemText, fileList
       ))
       if(DEBUG_NO_BACKEND){
         alert("上传题目成功！")
         resetInput()
         return
       }
-      fetch(SERVER_ROOT_URL + 'uploadProblem',{
+      fetch(SERVER_ROOT_URL + 'uploadProblem/',{
         method: "POST", 
         headers: {"Content-Type":"text/plain"},
         body: JSON.stringify(new UploadProblemMessage(
-          source, difficulty, problemBase, problemText, fileList
+          UserTokenStore.getState().userToken, source, difficulty, problemBase, problemText, fileList
         ))
       }).then(response => response.json()).then(replyJson => {
         console.log(replyJson)
@@ -130,11 +136,11 @@ const UploadProblemForm = (params: {
   }
   return <>
     <h2>选择难度</h2>
-      <Radio.Group value={params.difficulty} buttonStyle="solid" options={difficultyOptions} onChange={(e)=>{setDifficulty(e.target.value)}}>
+      <Radio.Group value={difficulty} buttonStyle="solid" options={difficultyOptions} onChange={(e)=>{setDifficulty(e.target.value)}}>
       </Radio.Group>
       <h2>选择题源</h2>
       <Select
-        value={params.source}
+        value={source}
         style={{ width: 120 }}
         onChange={(v: string)=>{setSource(v)}}
         options={sourceOptions}
@@ -157,7 +163,8 @@ const UploadProblemForm = (params: {
       <KatexSpan text={problemText}/>
       <h2>题目图片</h2>
       <Upload
-      action="https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188"
+      // action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+      action={SERVER_ROOT_URL + 'uploadFile/'}
       listType="picture"
       defaultFileList={[...fileList]}
       onChange={handleChange}

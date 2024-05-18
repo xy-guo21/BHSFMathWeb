@@ -20,7 +20,7 @@ const PaperListPage: React.FC = ()=>{
             setPaperIDs(paperIDs_debug)
         }
         else{
-            fetch(SERVER_ROOT_URL+'queryProblemList', {
+            fetch(SERVER_ROOT_URL+'queryPaperList', {
                 method: "GET",
                 headers: {"Content-Type": "text/plain"}
             }).then(response=>response.json()).then(response =>{

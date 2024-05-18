@@ -13,7 +13,7 @@ const paperQueryIDFetch = ({paperID}: {paperID: string})=> {
         paper = (papers_debug.filter((pa)=>(pa.paperID === paperID))[0])
     }
     else{
-        fetch(SERVER_ROOT_URL + 'problemQueryID', {
+        fetch(SERVER_ROOT_URL + 'paperQueryID', {
             method: "POST", 
             headers: {"Content-Type":"text/plain"},
             body: JSON.stringify(new QueryPaperDetailMessage(paperID))

@@ -90,7 +90,7 @@ class User(AbstractUser):
 class UserTokenStore(models.Model):
     username = models.CharField(max_length=10)
     userToken = models.CharField(max_length=100)
-    createTime = models.CharField(max_length=10)
+    createTime = models.CharField(max_length=100)
     
     def create_userTokenStore(self, username):
         createTime = time.strftime('%Y%m%d_%H%M%S')
